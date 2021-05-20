@@ -13,7 +13,7 @@ CREATE TABLE Movies (
   title TEXT NOT NULL,
   year INT NOT NULL,
   director TEXT NOT NULL,
-  banner_url TEXT
+  banner_url TEXT NOT NULL
 );
 
 CREATE TABLE Stars (
