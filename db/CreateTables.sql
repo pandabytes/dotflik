@@ -12,13 +12,15 @@ CREATE TABLE Movies (
   id TEXT PRIMARY KEY,
   title TEXT NOT NULL,
   year INT NOT NULL,
-  director TEXT NOT NULL
+  director TEXT NOT NULL,
+  banner_url TEXT
 );
 
 CREATE TABLE Stars (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  birth_year INT
+  birth_year INT,
+  headshot TEXT NOT NULL
 );
 
 CREATE TABLE Stars_In_Movies (
