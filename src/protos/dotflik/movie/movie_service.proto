@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package proto.dotflik.movie;
+
+import "google/protobuf/empty.proto";
+
+service MovieService {
+  rpc GetMovies(google.protobuf.Empty) returns (stream Movie);
+  rpc GetMovieById(GetMoviByIdRequest) returns (GetMovieByIdResponse);
+  rpc GetMovieByTitle(GetMoviByIdRequest) returns (GetMovieByIdResponse);
+  rpc GetMoviesByYear(GetMoviesByYearRequest) returns (stream Movie);
+
+  rpc RateMovie(RateMovieRequest) returns (google.protobuf.Empty);
+}
+
+message Movie {
+  string id = 1;
+  string title = 2;
+  int32 year = 3;
+  string director = 4;
+  string banner_url = 5;
+}
+
+message GetMoviByIdRequest {
+  string id = 1;
+}
+
+message GetMovieByIdResponse {
+  Movie movie = 1;
+}
+
+message GetMoviByTitleRequest {
+  string title = 1;
+}
+
+message GetMovieByTitleResponse {
+  Movie movie = 1;
+}
+
+message GetMoviesByYearRequest {
+  int32 from = 1;
+  int32 to = 2;
+}
+
+message RateMovieRequest {
+  string id = 1;
+  int32 rating = 2;
+}

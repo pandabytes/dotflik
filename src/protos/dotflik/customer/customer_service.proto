@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package proto.dotflik.customer;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service CustomerService {
+  rpc Login(LoginRequest) returns (LoginResponse);
+  rpc Logout(google.protobuf.Empty) returns (google.protobuf.Empty);
+
+  rpc ChangeEmail(ChangeEmailRequest) returns (google.protobuf.Empty);
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+
+  rpc AddCreditCard(AddCreditCardRequest) returns (google.protobuf.Empty);
+  rpc RemoveCreditCard(RemoveCreditCardRequest) returns (google.protobuf.Empty);
+  rpc UpdateCreditCard(UpdateCreditCardRequest) returns (google.protobuf.Empty);
+}
+
+message Customer {
+  int32 id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string cc_id = 4;
+  string email = 5;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string fail_message = 1;
+  Customer customer = 2;
+}
+
+message ChangePasswordRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message ChangeEmailRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message AddCreditCardRequest {
+  string customer_id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  google.protobuf.Timestamp expiration_date = 4;
+}
+
+message RemoveCreditCardRequest {
+  string customer_id = 1;
+  string cc_id;
+}
+
+message UpdateCreditCardRequest {
+  string customer_id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  google.protobuf.Timestamp expiration_date = 4;
+}
+
+
+
