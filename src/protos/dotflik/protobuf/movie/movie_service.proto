@@ -1,14 +1,16 @@
 syntax = "proto3";
 
-package proto.dotflik.movie;
+package dotflik.protobuf.movie;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
 
 service MovieService {
   rpc GetMovies(google.protobuf.Empty) returns (stream Movie);
-  rpc GetMovieById(GetMoviByIdRequest) returns (GetMovieByIdResponse);
-  rpc GetMovieByTitle(GetMoviByIdRequest) returns (GetMovieByIdResponse);
+  rpc GetMovieById(GetMovieByIdRequest) returns (GetMovieByIdResponse);
+  rpc GetMovieByTitle(GetMovieByTitleRequest) returns (GetMovieByIdResponse);
   rpc GetMoviesByYear(GetMoviesByYearRequest) returns (stream Movie);
+  rpc GetMoviesByRating(GetMoviesByRatingRequest) returns (stream Movie);
 
   rpc RateMovie(RateMovieRequest) returns (google.protobuf.Empty);
 }
@@ -21,7 +23,7 @@ message Movie {
   string banner_url = 5;
 }
 
-message GetMoviByIdRequest {
+message GetMovieByIdRequest {
   string id = 1;
 }
 
@@ -29,7 +31,7 @@ message GetMovieByIdResponse {
   Movie movie = 1;
 }
 
-message GetMoviByTitleRequest {
+message GetMovieByTitleRequest {
   string title = 1;
 }
 
@@ -44,5 +46,11 @@ message GetMoviesByYearRequest {
 
 message RateMovieRequest {
   string id = 1;
-  int32 rating = 2;
+  float rating = 2;
+}
+
+message GetMoviesByRatingRequest {
+  float rating_min = 1;
+  float rating_max = 2;
+  google.protobuf.Int32Value limit = 3;
 }
