@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dotflik.Domain.Entities;
 
@@ -16,7 +17,18 @@ namespace Dotflik.Application.Repositories
     /// <returns>Movie object or null if not found</returns>
     Task<Movie?> GetByTitleAsync(string title);
 
-    //Task<IEnumerable<Movie>> GetMovieByYear(int from, int to);
+    /// <summary>
+    /// Get movies within the year range [<paramref name="from"/>, <paramref name="to"/>]
+    /// asynchronously. Use <paramref name="limit"/> and <paramref name="offset"/> to limit
+    /// the number of movies to return
+    /// </summary>
+    /// <param name="limit">Limit of the number of movies</param>
+    /// <param name="offset">The offset to start from</param>
+    /// <param name="from">From year</param>
+    /// <param name="to">To year</param>
+    /// <param name="sortAsc">If true, sort the results in acending order. Else descending order</param>
+    /// <returns>Collection of movies</returns>
+    Task<IEnumerable<Movie>> GetMoviesByYear(int limit, int offset, int from, int to, bool sortAsc);
 
     //Task<IEnumerable<Movie>> GetMoviesByRating(float minRating, float maxRating, int? limit);
   }

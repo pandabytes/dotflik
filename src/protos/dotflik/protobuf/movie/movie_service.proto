@@ -10,13 +10,15 @@ service MovieService {
   // List movies with pagination
   rpc ListMovies(ListMoviesRequest) returns (ListMoviesResponse);
 
+  // List movies given a year range
+  rpc ListMoviesByYear(ListMoviesByYearRequest) returns (ListMoviesByYearResponse);
+
   // Get a movie by its id
   rpc GetMovieById(GetMovieByIdRequest) returns (Movie);
 
   // Get a movie by its title
-  rpc GetMovieByTitle(GetMovieByTitleRequest) returns (Movie);
+  rpc GetMovieByTitle(GetMovieByTitleRequest) returns (Movie);  
 
-//   rpc GetMoviesByYear(GetMoviesByYearRequest) returns (stream Movie);
 //   rpc GetMoviesByRating(GetMoviesByRatingRequest) returns (stream Movie);
 
 //   rpc RateMovie(RateMovieRequest) returns (google.protobuf.Empty);
@@ -50,7 +52,8 @@ message ListMoviesResponse {
   repeated Movie movies = 1;
 
   // The next page token to use. Use this token to request the next
-  // page of results
+  // page of results. If it's empty then it means there is no more
+  // movies to get
   string next_page_token = 2; 
 }
 
@@ -59,14 +62,49 @@ message GetMovieByIdRequest {
   string id = 1; // Id of the movie
 }
 
+// The request to get the movie by its title
 message GetMovieByTitleRequest {
-  string title = 1;
+  string title = 1; // Title of the movie
 }
 
-// message GetMoviesByYearRequest {
-//   int32 from = 1;
-//   int32 to = 2;
-// }
+// The request to list movies by a year range using pagination
+message ListMoviesByYearRequest {
+// The number of movies per page to request. The maximum number of movies 
+  // to request is determined by the server. If the request number 
+  // execeeds the maximum number OR the request number <= 0,
+  // then at most maximum number of movies is returned
+  int32 page_size = 1;
+
+  // The page token to request the specific page. Empty token means
+  // requesting the 1st page
+  string page_token = 2;
+
+  // From year
+  int32 from = 3;
+
+  // To year
+  int32 to = 4;
+
+  // Specify the sort order on the year column of the returned results
+  enum SortYear {
+    SORTYEAR_ASC = 0; // Tell service to return results sorted by year in ascending order
+    SORTYEAR_DESC = 1; // Tell service to return results sorted by year in descending order
+  }
+
+  // The order to sort the results
+  SortYear sort_year = 5;
+}
+
+// The response to get movies by year range using pagination
+message ListMoviesByYearResponse {
+  // List of movies 
+  repeated Movie movies = 1;
+
+  // The next page token to use. Use this token to request the next
+  // page of results. If it's empty then it means there is no more
+  // movies to get
+  string next_page_token = 2; 
+}
 
 // message RateMovieRequest {
 //   string id = 1;

@@ -20,6 +20,7 @@ namespace Dotflik.WebApp.Server.Services
   public class MovieService : Protobuf.Movie.MovieService.MovieServiceBase
   {
     private const int MaxPageSize = 50;
+    private const string PageTokenFormat = "offset={0}";
 
     private readonly ILogger<MovieService> m_logger;
     private readonly IMovieRepository m_movieRepository;
@@ -41,7 +42,8 @@ namespace Dotflik.WebApp.Server.Services
       var offset = ParsePageToken(pageToken);
       if (offset == null)
       {
-        var status = new Status(StatusCode.InvalidArgument, "page_token must be in this format \"offset=<int>\"");
+        var sampleToken = string.Format(PageTokenFormat, "N");
+        var status = new Status(StatusCode.InvalidArgument, $"page_token must be in this format \"{sampleToken}\"");
         throw new RpcException(status);
       }
 
@@ -64,7 +66,11 @@ namespace Dotflik.WebApp.Server.Services
         throw new RpcException(status);
       }
 
-      var nextPageToken = $"offset={offset + pageSize}";
+      // If the returned movies count is less than the page size, then it means
+      // there is no more movies to get so set the next page token to empty
+      var nextPageToken = movies.Count() >= pageSize ?
+        string.Format(PageTokenFormat, offset + pageSize) : string.Empty;
+
       var response = new ListMoviesResponse { NextPageToken = nextPageToken };
       var protobufMovies = movies.Select(m => m.ToProtobuf());
       response.Movies.AddRange(protobufMovies);
@@ -120,15 +126,77 @@ namespace Dotflik.WebApp.Server.Services
       }
     }
 
+    /// <inheritdoc/>
+    public override async Task<ListMoviesByYearResponse> ListMoviesByYear(ListMoviesByYearRequest request, ServerCallContext context)
+    {
+      var pageSize = request.PageSize;
+      var pageToken = request.PageToken;
+      var fromYear = request.From;
+      var toYear = request.To;
+
+      if (fromYear > toYear)
+      {
+        var status = new Status(StatusCode.InvalidArgument, $"\"From year\" {fromYear} must be less than \"to year\" {toYear}");
+        throw new RpcException(status);
+      }
+
+      // Get the offset from the provided page token
+      var offset = ParsePageToken(pageToken);
+      if (offset == null)
+      {
+        var sampleToken = string.Format(PageTokenFormat, "N");
+        var status = new Status(StatusCode.InvalidArgument, $"page_token must be in this format \"{sampleToken}\"");
+        throw new RpcException(status);
+      }
+
+      // Constraint the page size to be within max range
+      if (pageSize > MaxPageSize || pageSize <= 0)
+      {
+        pageSize = MaxPageSize;
+      }
+
+      IEnumerable<Domain.Entities.Movie> movies;
+      try
+      {
+        var sortAscending = (request.SortYear == ListMoviesByYearRequest.Types.SortYear.Asc);
+        movies = await m_movieRepository.GetMoviesByYear(pageSize, (int)offset, fromYear, toYear, sortAscending);
+      }
+      catch (RepositoryException ex)
+      {
+        m_logger.LogError(ex.ToString());
+
+        var status = new Status(StatusCode.Internal, "Something has gone wrong with getting movies from database");
+        throw new RpcException(status);
+      }
+
+      // If the returned movies count is less than the page size, then it means
+      // there is no more movies to get so set the next page token to empty
+      var nextPageToken = movies.Count() >= pageSize ? 
+        string.Format(PageTokenFormat, offset + pageSize) : string.Empty;
+
+      var response = new ListMoviesByYearResponse { NextPageToken = nextPageToken };
+      var protobufMovies = movies.Select(m => m.ToProtobuf());
+      response.Movies.AddRange(protobufMovies);
+
+      return response;
+    }
+
     /// <summary>
     /// Parse the page token to get the offset
     /// </summary>
+    /// <remarks>
+    /// If <paramref name="pageToken"/> is empty, then 0 is returned
+    /// </remarks>
     /// <param name="pageToken">Page token</param>
     /// <returns>If successful, an offset value is returned. Else null</returns>
     private static int? ParsePageToken(string pageToken)
     {
-      var tokens = pageToken.Split('=');
+      if (string.IsNullOrWhiteSpace(pageToken))
+      {
+        return 0;
+      }
 
+      var tokens = pageToken.Split('=');
       if (!pageToken.Contains("offset") || tokens.Length != 2)
       {
         return null;

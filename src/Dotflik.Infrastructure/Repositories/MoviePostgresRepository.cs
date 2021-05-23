@@ -113,5 +113,38 @@ namespace Dotflik.Infrastructure.Repositories
       }
     }
 
+    /// <inheritdoc/>
+    async Task<IEnumerable<Movie>> IMovieRepository.GetMoviesByYear(int limit, int offset, int from, int to, bool sortAsc)
+    {
+      var parameters = new { Limit = limit, Offset = offset, 
+                             From = from,   To = to };
+      var sortOrder = sortAsc ? "ASC" : "DESC";
+      var sql = $@"
+        SELECT *
+        FROM {RepositoryName}
+        WHERE year >= @From AND year <= @To
+        ORDER BY year {sortOrder}
+        LIMIT @Limit
+        OFFSET @Offset
+      ";
+
+      try
+      {
+        await using var connection = new NpgsqlConnection(m_dbSettings.ConnectionString);
+        await connection.OpenAsync();
+
+        var movies = await connection.QueryAsync<Movie>(sql, parameters);
+        return movies;
+      }
+      catch (Exception ex) when
+        (ex is PostgresException || ex is NpgsqlException)
+      {
+        var errorMessage = $@"Fail to get movies within the year range [{from}, {to}] 
+                              and limit={limit}, offset={offset}";
+        throw new RepositoryException(errorMessage, ex);
+      }
+    }
+
+
   }
 }
