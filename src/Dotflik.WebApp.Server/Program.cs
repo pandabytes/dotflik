@@ -5,9 +5,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 
-using Dotflik.WebApp.Server.Models;
-using Dotflik.WebApp.Server.Validations;
-
 namespace Dotflik.WebApp.Server
 {
   public class Program
@@ -16,8 +13,9 @@ namespace Dotflik.WebApp.Server
     {
       CreateHostBuilder(args)
         .Build()
-        .BeginOptionsValidation<DatabaseSettings>()
         .Run();
+      //var m = new Domain.Entities.Movie("", "", 0, "", "");
+      //dynamic c = new { m.Director, m.Year };
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>

@@ -9,6 +9,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{98B705CB-2ED
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotflik.WebApp.Server", "src\Dotflik.WebApp.Server\Dotflik.WebApp.Server.csproj", "{A451249D-9EC2-44E3-9E5C-5500D8C04DDA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotflik.Application", "src\Dotflik.Application\Dotflik.Application.csproj", "{878A4AAC-44B2-4D4E-8EBA-E2119D61C178}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotflik.Infrastructure", "src\Dotflik.Infrastructure\Dotflik.Infrastructure.csproj", "{CE6AA6AA-E7E1-41FD-936B-7FB50585A106}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +27,14 @@ Global
 		{A451249D-9EC2-44E3-9E5C-5500D8C04DDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A451249D-9EC2-44E3-9E5C-5500D8C04DDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A451249D-9EC2-44E3-9E5C-5500D8C04DDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{878A4AAC-44B2-4D4E-8EBA-E2119D61C178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{878A4AAC-44B2-4D4E-8EBA-E2119D61C178}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{878A4AAC-44B2-4D4E-8EBA-E2119D61C178}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{878A4AAC-44B2-4D4E-8EBA-E2119D61C178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE6AA6AA-E7E1-41FD-936B-7FB50585A106}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE6AA6AA-E7E1-41FD-936B-7FB50585A106}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE6AA6AA-E7E1-41FD-936B-7FB50585A106}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE6AA6AA-E7E1-41FD-936B-7FB50585A106}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -30,6 +42,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{527A486C-BADF-4AF6-BEB8-775B84F98E77} = {98B705CB-2ED3-47C6-A0EF-3AD697F8A1F5}
 		{A451249D-9EC2-44E3-9E5C-5500D8C04DDA} = {98B705CB-2ED3-47C6-A0EF-3AD697F8A1F5}
+		{878A4AAC-44B2-4D4E-8EBA-E2119D61C178} = {98B705CB-2ED3-47C6-A0EF-3AD697F8A1F5}
+		{CE6AA6AA-E7E1-41FD-936B-7FB50585A106} = {98B705CB-2ED3-47C6-A0EF-3AD697F8A1F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A9ED0A4-9222-4DAC-BE18-3B1737312F8C}

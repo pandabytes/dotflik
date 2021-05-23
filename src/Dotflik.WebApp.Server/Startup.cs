@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using System;
 
 using Dotflik.WebApp.Server.Services;
-using Dotflik.WebApp.Server.Models;
+using Dotflik.Infrastructure;
 
 namespace Dotflik.WebApp.Server
 {
@@ -27,9 +27,8 @@ namespace Dotflik.WebApp.Server
       services.AddGrpc();
       services.AddGrpcReflection();
 
-      services.AddOptions<DatabaseSettings>()
-        .Bind(Configuration.GetSection(DatabaseSettings.SectionPath))
-        .ValidateDataAnnotations();
+      services.AddDbSettings(Configuration)
+              .AddRepositories();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

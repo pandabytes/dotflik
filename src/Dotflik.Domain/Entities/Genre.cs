@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Fabflix.Domain.Entities
+namespace Dotflik.Domain.Entities
 {
   //public enum Genre
   //{
