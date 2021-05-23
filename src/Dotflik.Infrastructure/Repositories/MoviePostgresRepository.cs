@@ -64,7 +64,7 @@ namespace Dotflik.Infrastructure.Repositories
       throw new NotImplementedException();
     }
 
-    /// <inheritdoc/> 
+    /// <inheritdoc/>
     async Task<Movie?> IRepository<Movie>.GetByIdAsync(string id)
     {
       var parameters = new { Id = id };
@@ -90,5 +90,28 @@ namespace Dotflik.Infrastructure.Repositories
     {
       throw new NotImplementedException();
     }
+
+    /// <inheritdoc/>
+    async Task<Movie?> IMovieRepository.GetByTitleAsync(string title)
+    {
+      var parameters = new { Title = title };
+      var sql = $"SELECT * FROM {RepositoryName} WHERE title = @Title";
+      try
+      {
+        await using var connection = new NpgsqlConnection(m_dbSettings.ConnectionString);
+        await connection.OpenAsync();
+
+        // Use Query instead of QuerySingle to avoid InvalidOperationException
+        // if the id is not found
+        var movies = connection.Query<Movie>(sql, parameters).AsList();
+        return movies?.Count == 1 ? movies[0] : null;
+      }
+      catch (Exception ex) when
+        (ex is PostgresException || ex is NpgsqlException)
+      {
+        throw new RepositoryException($"Fail to get movie with title={title}", ex);
+      }
+    }
+
   }
 }

@@ -96,6 +96,30 @@ namespace Dotflik.WebApp.Server.Services
       }
     }
 
+    /// <inheritdoc/>
+    public override async Task<Movie> GetMovieByTitle(GetMovieByTitleRequest request, ServerCallContext context)
+    {
+      var title = request.Title;
+      try
+      {
+        var movie = await m_movieRepository.GetByTitleAsync(title);
+        if (movie == null)
+        {
+          var status = new Status(StatusCode.InvalidArgument, $"Unable to find movie with title \"{title}\"");
+          throw new RpcException(status);
+        }
+
+        return movie.ToProtobuf();
+      }
+      catch (RepositoryException ex)
+      {
+        m_logger.LogError(ex.ToString());
+
+        var status = new Status(StatusCode.Internal, $"Something has gone wrong with getting movie with id={title} from database");
+        throw new RpcException(status);
+      }
+    }
+
     /// <summary>
     /// Parse the page token to get the offset
     /// </summary>

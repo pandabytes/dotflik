@@ -12,7 +12,10 @@ service MovieService {
 
   // Get a movie by its id
   rpc GetMovieById(GetMovieByIdRequest) returns (Movie);
-//   rpc GetMovieByTitle(GetMovieByTitleRequest) returns (Movie);
+
+  // Get a movie by its title
+  rpc GetMovieByTitle(GetMovieByTitleRequest) returns (Movie);
+
 //   rpc GetMoviesByYear(GetMoviesByYearRequest) returns (stream Movie);
 //   rpc GetMoviesByRating(GetMoviesByRatingRequest) returns (stream Movie);
 
@@ -56,9 +59,9 @@ message GetMovieByIdRequest {
   string id = 1; // Id of the movie
 }
 
-//message GetMovieByTitleRequest {
-//  string title = 1;
-//}
+message GetMovieByTitleRequest {
+  string title = 1;
+}
 
 // message GetMoviesByYearRequest {
 //   int32 from = 1;

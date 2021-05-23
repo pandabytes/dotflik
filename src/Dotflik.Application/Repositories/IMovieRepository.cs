@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Dotflik.Domain.Entities;
 
 namespace Dotflik.Application.Repositories
@@ -8,7 +9,12 @@ namespace Dotflik.Application.Repositories
   /// </summary>
   public interface IMovieRepository : IRepository<Movie>
   {
-    //Task<IEnumerable<Movie>> GetMovieByTitle(string title);
+    /// <summary>
+    /// Get a movie by its title asynchronously
+    /// </summary>
+    /// <param name="title">Title of the movie</param>
+    /// <returns>Movie object or null if not found</returns>
+    Task<Movie?> GetByTitleAsync(string title);
 
     //Task<IEnumerable<Movie>> GetMovieByYear(int from, int to);
 
