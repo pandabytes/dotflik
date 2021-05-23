@@ -32,7 +32,7 @@ namespace Dotflik.WebApp.Server.Services
       => (m_movieRepository, m_logger) = (movieRepository, logger);
 
     /// <inheritdoc/>
-    public override async Task<GetMoviesResponse> ListMovies(GetMoviesRequest request, ServerCallContext context)
+    public override async Task<ListMoviesResponse> ListMovies(ListMoviesRequest request, ServerCallContext context)
     {
       var pageSize = request.PageSize;
       var pageToken = request.PageToken;
@@ -65,11 +65,35 @@ namespace Dotflik.WebApp.Server.Services
       }
 
       var nextPageToken = $"offset={offset + pageSize}";
-      var response = new GetMoviesResponse { NextPageToken = nextPageToken };
+      var response = new ListMoviesResponse { NextPageToken = nextPageToken };
       var protobufMovies = movies.Select(m => m.ToProtobuf());
       response.Movies.AddRange(protobufMovies);
 
       return response;
+    }
+
+    /// <inheritdoc/>
+    public override async Task<Movie> GetMovieById(GetMovieByIdRequest request, ServerCallContext context)
+    {
+      var id = request.Id;
+      try
+      {
+        var movie = await m_movieRepository.GetByIdAsync(id);
+        if (movie == null)
+        {
+          var status = new Status(StatusCode.InvalidArgument, $"Unable to find movie with id {id}");
+          throw new RpcException(status);
+        }
+
+        return movie.ToProtobuf();
+      }
+      catch (RepositoryException ex)
+      {
+        m_logger.LogError(ex.ToString());
+
+        var status = new Status(StatusCode.Internal, $"Something has gone wrong with getting movie with id={id} from database");
+        throw new RpcException(status);
+      }
     }
 
     /// <summary>

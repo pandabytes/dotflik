@@ -8,9 +8,10 @@ import "google/protobuf/wrappers.proto";
 // Service for handling querying and updating movies
 service MovieService {
   // List movies with pagination
-  rpc ListMovies(GetMoviesRequest) returns (GetMoviesResponse);
+  rpc ListMovies(ListMoviesRequest) returns (ListMoviesResponse);
 
-//   rpc GetMovieById(GetMovieByIdRequest) returns (Movie);
+  // Get a movie by its id
+  rpc GetMovieById(GetMovieByIdRequest) returns (Movie);
 //   rpc GetMovieByTitle(GetMovieByTitleRequest) returns (Movie);
 //   rpc GetMoviesByYear(GetMoviesByYearRequest) returns (stream Movie);
 //   rpc GetMoviesByRating(GetMoviesByRatingRequest) returns (stream Movie);
@@ -28,7 +29,7 @@ message Movie {
 }
 
 // The request to get movies using pagination
-message GetMoviesRequest {
+message ListMoviesRequest {
   // The number of movies per page to request. The maximum number of movies 
   // to request is determined by the server. If the request number 
   // execeeds the maximum number OR the request number <= 0,
@@ -41,7 +42,7 @@ message GetMoviesRequest {
 }
 
 // The response to get movies using pagination
-message GetMoviesResponse {
+message ListMoviesResponse {
   // List of movies 
   repeated Movie movies = 1;
 
@@ -50,13 +51,14 @@ message GetMoviesResponse {
   string next_page_token = 2; 
 }
 
-// message GetMovieByIdRequest {
-//   string id = 1;
-// }
+// The request to get the movie by its id
+message GetMovieByIdRequest {
+  string id = 1; // Id of the movie
+}
 
-// message GetMovieByTitleRequest {
-//   string title = 1;
-// }
+//message GetMovieByTitleRequest {
+//  string title = 1;
+//}
 
 // message GetMoviesByYearRequest {
 //   int32 from = 1;
