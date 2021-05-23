@@ -2,5 +2,14 @@
 
 namespace Dotflik.Domain.Entities
 {
-  public record Star(string Id, string Name, int BirthYear, string? Headshot);
+  public class Star
+  {
+    public string Id { get; init; } = string.Empty;
+
+    public string Name { get; init; } = string.Empty;
+
+    public int BirthYear { get; init; }
+
+    public string? Headshot { get; init; }
+  }
 }

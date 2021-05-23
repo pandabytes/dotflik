@@ -2,17 +2,15 @@
 
 namespace Dotflik.Domain.Entities
 {
-  //public record Movie(string Id, string Title, int Year, string Director, string? BannerUrl);
-
   public class Movie
   {
-    public string Id { get; init; } = null!;
+    public string Id { get; init; } = string.Empty;
 
-    public string Title { get; init; } = null!;
+    public string Title { get; init; } = string.Empty;
 
     public int Year { get; init; }
 
-    public string Director { get; init; } = null!;
+    public string Director { get; init; } = string.Empty;
 
     public string? BannerUrl { get; init; }
   }

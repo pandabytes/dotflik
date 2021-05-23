@@ -2,33 +2,10 @@
 
 namespace Dotflik.Domain.Entities
 {
-  //public enum Genre
-  //{
-  //  None,
-  //  Action,
-  //  Adult,
-  //  Adventure,
-  //  Animation,
-  //  Biography,
-  //  Comedy,
-  //  Crime,
-  //  Documentary,
-  //  Drama,
-  //  Family,
-  //  Fantasy,
-  //  History,
-  //  Horror,
-  //  Music,
-  //  Musical,
-  //  Mystery,
-  //  RealityTv,
-  //  Romance,
-  //  SciFi,
-  //  Sport,
-  //  Thriller,
-  //  War,
-  //  Western
-  //}
+  public class Genre
+  {
+    public string Id { get; init; } = string.Empty;
 
-  public record Genre(int Id, string Name);
+    public string Name { get; init; } = string.Empty;
+  }
 }
