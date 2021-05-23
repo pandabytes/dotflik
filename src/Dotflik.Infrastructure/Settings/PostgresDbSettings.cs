@@ -16,23 +16,23 @@ namespace Dotflik.Infrastructure.Settings
     public static readonly string SectionKey = "DatabaseSettings";
 
     /// <inheritdoc/>
-    string IDatabaseSettings.ConnectionString 
+    string IDatabaseSettings.ConnectionString
       => $"Host={Host};Port={Port};Username={Username};Password={Password};Database={Database}";
 
     [Required]
-    public string Database { get; init; } = null!;
+    public string Database { get; init; } = string.Empty;
 
     [Required]
-    public string Host { get; init; } = null!;
+    public string Host { get; init; } = string.Empty;
 
     [Range(1, 65535)]
     public int Port { get; init; }
 
     [Required]
-    public string Username { get; init; } = null!;
+    public string Username { get; init; } = string.Empty;
 
     [Required]
-    public string Password { get; init; } = null!;
+    public string Password { get; init; } = string.Empty;
 
   }
 }
