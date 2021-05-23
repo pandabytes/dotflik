@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Dotflik.Application.Repositories;
 using Dotflik.Application.Settings;
 using Dotflik.Domain.Entities;
+using Dotflik.Domain.Exceptions;
 using Dapper;
 using Npgsql;
 
@@ -43,11 +44,19 @@ namespace Dotflik.Infrastructure.Repositories
       var parameters = new { Limit = limit, Offset = offset };
       var sql = $"SELECT * FROM {RepositoryName} ORDER BY id LIMIT @Limit OFFSET @Offset";
 
-      await using var connection = new NpgsqlConnection(m_dbSettings.ConnectionString);
-      await connection.OpenAsync();
-      
-      var movies = connection.Query<Movie>(sql, parameters);
-      return movies;
+      try
+      {
+        await using var connection = new NpgsqlConnection(m_dbSettings.ConnectionString);
+        await connection.OpenAsync();
+
+        var movies = await connection.QueryAsync<Movie>(sql, parameters);
+        return movies;
+      }
+      catch (Exception ex) when
+        (ex is PostgresException || ex is NpgsqlException)
+      {
+        throw new RepositoryException($"Fail to get movies with limit={limit} and offset={offset}", ex);
+      }
     }
 
     async Task<Movie?> IRepository<Movie>.GetByIdAsync(int id)

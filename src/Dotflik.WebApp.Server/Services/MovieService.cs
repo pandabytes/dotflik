@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
+using Microsoft.Extensions.Logging;
+
 using Dotflik.Protobuf.Movie;
 using Dotflik.WebApp.Server.Mappings;
 using Dotflik.Application.Repositories;
+using Dotflik.Domain.Exceptions;
 
 namespace Dotflik.WebApp.Server.Services
 {
@@ -17,27 +21,28 @@ namespace Dotflik.WebApp.Server.Services
   {
     private const int MaxPageSize = 50;
 
+    private readonly ILogger<MovieService> m_logger;
     private readonly IMovieRepository m_movieRepository;
 
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="movieRepository">Movie repository object</param>
-    public MovieService(IMovieRepository movieRepository)
-      => m_movieRepository = movieRepository;
+    public MovieService(IMovieRepository movieRepository, ILogger<MovieService> logger)
+      => (m_movieRepository, m_logger) = (movieRepository, logger);
 
     /// <inheritdoc/>
     public override async Task<GetMoviesResponse> ListMovies(GetMoviesRequest request, ServerCallContext context)
     {
       var pageSize = request.PageSize;
       var pageToken = request.PageToken;
-      var offset = 0;
 
       // Get the offset from the provided page token
-      if (!string.IsNullOrWhiteSpace(pageToken))
+      var offset = ParsePageToken(pageToken);
+      if (offset == null)
       {
-        var tokens = pageToken.Split('&');
-        offset = int.Parse(tokens[1].Split('=')[1]);
+        var status = new Status(StatusCode.InvalidArgument, "page_token must be in this format \"offset=<int>\"");
+        throw new RpcException(status);
       }
 
       // Constraint the page size to be within max range
@@ -46,84 +51,44 @@ namespace Dotflik.WebApp.Server.Services
         pageSize = MaxPageSize;
       }
 
-      var movies = await m_movieRepository.GetAllAsync(pageSize, offset);
-      
-      var response = new GetMoviesResponse { NextPageToken = "next_token" };
+      IEnumerable<Domain.Entities.Movie> movies;
+      try
+      {
+        movies = await m_movieRepository.GetAllAsync(pageSize, (int)offset);
+      }
+      catch (RepositoryException ex)
+      {
+        m_logger.LogError(ex.ToString());
+
+        var status = new Status(StatusCode.Internal, "Something has gone wrong with getting movies from database");
+        throw new RpcException(status);
+      }
+
+      var nextPageToken = $"offset={offset + pageSize}";
+      var response = new GetMoviesResponse { NextPageToken = nextPageToken };
       var protobufMovies = movies.Select(m => m.ToProtobuf());
       response.Movies.AddRange(protobufMovies);
-
-      var nextPageToken = $"limit={pageSize}&offset={offset + pageSize}"; ;
-      response.NextPageToken = nextPageToken;
 
       return response;
     }
 
+    /// <summary>
+    /// Parse the page token to get the offset
+    /// </summary>
+    /// <param name="pageToken">Page token</param>
+    /// <returns>If successful, an offset value is returned. Else null</returns>
+    private static int? ParsePageToken(string pageToken)
+    {
+      var tokens = pageToken.Split('=');
 
-    //public override async Task GetMovies(Empty request, IServerStreamWriter<Protobuf.Movie.Movie> responseStream, ServerCallContext context)
-    //{
-    //  //await GetMovies();
+      if (!pageToken.Contains("offset") || tokens.Length != 2)
+      {
+        return null;
+      }
 
-    //  for (int i = 0; i < 5; i++)
-    //  {
-    //    await using (var connection = new NpgsqlConnection(m_connectionString))
-    //    {
-    //      await connection.OpenAsync();
-    //      await using (var cmd = new NpgsqlCommand("SELECT * FROM movies limit 1", connection))
-    //      await using (var reader = await cmd.ExecuteReaderAsync())
-    //      {
-    //        while (await reader.ReadAsync())
-    //        {
-    //          await Task.Delay(1000);
-
-    //          //Console.WriteLine(reader.GetString(0));
-    //          var id = reader.GetString(0);
-    //          var title = reader.GetString(1);
-    //          var year = reader.GetInt32(2);
-    //          var director = reader.GetString(3);
-    //          string bannerUrl = string.Empty;
-
-    //          if (!reader.IsDBNull(4))
-    //          {
-    //            bannerUrl = reader.GetString(4);
-    //          }
-
-    //          var response = new Protobuf.Movie.Movie { Id = id, Title = title, Year = year, Director = director, BannerUrl = bannerUrl };
-    //          await responseStream.WriteAsync(response);
-    //        }
-    //      }
-
-    //      var movies = connection.Query<Protobuf.Movie.Movie>("SELECT * FROM movies LIMIT 0");
-
-    //    }
-
-    //    //var response = new Movie { Id = (i+1).ToString(), Year = 2021 + i + 1};
-    //    //await responseStream.WriteAsync(response);
-    //    break;
-    //  }
-    //}
-
-    //private async Task GetMovies()
-    //{
-    //  await using (var connection = new NpgsqlConnection(m_connectionString))
-    //  {
-    //    await connection.OpenAsync();
-    //    //connection.Execute("SELECT * FROM movies LIMIT 5");
-    //    //var movies = connection.Query<Protobuf.Movie.Movie>("SELECT * FROM movies LIMIT 5");
-
-    //    var builder = new SqlBuilder();
-    //    //var template = builder.AddTemplate("SELECT * FROM movies /**where**/");
-
-    //    //var movie = new Domain.Entities.Movie("", "", 0, "Mel Gibson", "https");
-    //    ////builder.OrWhere("director = @Director", new { movie.Director });
-    //    //builder.Where("id = @Id", new { movie.Director });
-    //    //builder.Where("year > @Year", new { movie.Director });
-    //    //builder.OrWhere("director = @Director", new { movie.Director });
-    //    //Console.WriteLine(movie.ToString());
-    //    //Console.WriteLine(template.RawSql);
-
-    //    //var movies = connection.Query<Protobuf.Movie.Movie>(template.RawSql, template.Parameters);
-    //  }
-    //}
+      var isInt = int.TryParse(tokens[1], out int offset);
+      return isInt ? offset : null;
+    }
 
   }
 }
