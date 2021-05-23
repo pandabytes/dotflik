@@ -20,7 +20,7 @@ def insertBanner(dbName: str, user: str, password: str,
 
       if "cover url" in movie:
         bannerUrl = movie["cover url"]
-        cur.execute(f"UPDATE movies SET banner_url = '{bannerUrl}' where id = '{movieId}'")
+        cur.execute(f"UPDATE movies SET bannerUrl = '{bannerUrl}' where id = '{movieId}'")
         print(f"{i+1} - Updated movie \"{movieId}\" {bannerUrl}")
       else:
         print(f"{i+1} - Movie \"{movieId}\" has no banner")

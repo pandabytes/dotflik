@@ -22,7 +22,7 @@ CREATE INDEX idx_stars_name ON Stars USING HASH
 
 CREATE INDEX idx_stars_birth_year ON Stars USING HASH
 (
-  birth_year
+  birthYear
 );
 
 CREATE INDEX idx_customers_email ON Customers USING HASH

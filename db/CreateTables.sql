@@ -13,19 +13,19 @@ CREATE TABLE Movies (
   title TEXT NOT NULL,
   year INT NOT NULL,
   director TEXT NOT NULL,
-  banner_url TEXT NOT NULL
+  bannerUrl TEXT NULL
 );
 
 CREATE TABLE Stars (
   id TEXT PRIMARY KEY,
   name TEXT NOT NULL,
-  birth_year INT,
-  headshot TEXT NOT NULL
+  birthYear INT,
+  headshot TEXT NULL
 );
 
 CREATE TABLE Stars_In_Movies (
-  star_id TEXT REFERENCES Stars(id),
-  movie_id TEXT REFERENCES Movies(id)
+  starId TEXT REFERENCES Stars(id),
+  movieId TEXT REFERENCES Movies(id)
 );
 
 CREATE TABLE Genres (
@@ -34,22 +34,22 @@ CREATE TABLE Genres (
 );
 
 CREATE TABLE Genres_In_Movies (
-  genre_id INT REFERENCES Genres(id),
-  movie_id TEXT REFERENCES Movies(id)
+  genreId INT REFERENCES Genres(id),
+  movieId TEXT REFERENCES Movies(id)
 );
 
 CREATE TABLE Credit_Cards (
   id TEXT PRIMARY KEY,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  expiration_date DATE NOT NULL
+  firstName TEXT NOT NULL,
+  lastName TEXT NOT NULL,
+  expirationDate DATE NOT NULL
 );
 
 CREATE TABLE Customers (
   id INT PRIMARY KEY,
-  first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  cc_id TEXT REFERENCES Credit_Cards(id),
+  firstName TEXT NOT NULL,
+  lastName TEXT NOT NULL,
+  ccId TEXT REFERENCES Credit_Cards(id),
   address TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL
@@ -57,13 +57,13 @@ CREATE TABLE Customers (
 
 CREATE TABLE Sales (
   id INT PRIMARY KEY,
-  customer_id INT REFERENCES Customers(id),
-  movie_id TEXT REFERENCES Movies(id),
-  sale_date DATE NOT NULL
+  customerId INT REFERENCES Customers(id),
+  movieId TEXT REFERENCES Movies(id),
+  saleDate DATE NOT NULL
 );
 
 CREATE TABLE Ratings (
-  movie_id TEXT REFERENCES Movies(id),
+  movieId TEXT REFERENCES Movies(id),
   rating FLOAT NOT NULL,
-  num_votes INT NOT NULL
+  numVotes INT NOT NULL
 );
