@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dotflik.Application.Repositories;
-using Dotflik.Application.Settings;
+using Dotflik.Application.Repositories.Settings;
 using Dotflik.Domain.Entities;
 using Dotflik.Domain.Exceptions;
 using Dapper;

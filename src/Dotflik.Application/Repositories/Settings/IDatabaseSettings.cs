@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Dotflik.Application.Settings
+namespace Dotflik.Application.Repositories.Settings
 {
   /// <summary>
   /// Interface for database settings

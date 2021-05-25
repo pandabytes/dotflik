@@ -1,14 +1,14 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Configuration;
-using Dotflik.Application.Settings;
+using Dotflik.Application.Repositories.Settings;
 
-namespace Dotflik.Infrastructure.Settings
+namespace Dotflik.WebApp.Server.Models
 {
   /// <summary>
   /// Containing database settings for PostgresSQL
   /// </summary>
-  internal class PostgresDbSettings : IDatabaseSettings
+  public class PostgresDbSettings : IDatabaseSettings
   {
     /// <summary>
     /// Define where this settings can be found in <see cref="IConfiguration"/>

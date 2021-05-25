@@ -5,6 +5,14 @@ using System.Threading.Tasks;
 namespace Dotflik.Application.Repositories
 {
   /// <summary>
+  /// List of available databases
+  /// </summary>
+  public enum Database
+  {
+    PostgresSQL
+  }
+
+  /// <summary>
   /// Generic interface for repository. This interface provides
   /// basic CRUD (Create, Read, Update, Delete) operations on
   /// a database

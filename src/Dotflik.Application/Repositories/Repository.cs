@@ -1,5 +1,5 @@
 ﻿using System;
-using Dotflik.Application.Settings;
+using Dotflik.Application.Repositories.Settings;
 
 namespace Dotflik.Application.Repositories
 {
@@ -22,9 +22,20 @@ namespace Dotflik.Application.Repositories
     /// <summary>
     /// Constructor
     /// </summary>
+    /// <exception cref="ArgumentException">
+    /// Thrown when <paramref name="dbSettings"/> has an 
+    /// empty connection string
+    /// </exception>
     /// <param name="dbSettings">The database settings object</param>
     public Repository(IDatabaseSettings dbSettings)
-      => m_dbSettings = dbSettings;
+    {
+      if (string.IsNullOrWhiteSpace(dbSettings.ConnectionString))
+      {
+        throw new ArgumentException("Connection string must not be empty");
+      }
+
+      m_dbSettings = dbSettings;
+    }
 
   }
 }
