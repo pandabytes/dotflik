@@ -1,11 +1,10 @@
 using System;
 using System.Reflection;
-using Dotflik.Application.Repositories;
 using Dotflik.Application.Repositories.Settings;
 using Xunit;
 using Moq;
 
-namespace Dotflik.Application.UnitTests
+namespace Dotflik.Application.Repositories.UnitTests
 {
   public class RepositoryTests
   {

@@ -8,9 +8,9 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
 using Dotflik.Protobuf.Movie;
-using Dotflik.WebApp.Server.Mappings;
 using Dotflik.Application.Repositories;
 using Dotflik.Domain.Exceptions;
+using Dotflik.WebApp.Server.Mappings;
 
 namespace Dotflik.WebApp.Server.Services
 {

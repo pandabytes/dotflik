@@ -5,7 +5,7 @@ namespace Dotflik.WebApp.Server.Mappings
   /// <summary>
   /// Provide extension methods that map entity object to dto object
   /// </summary>
-  internal static class EntityToDtoMappings
+  public static class EntityToDtoMappings
   {
     /// <summary>
     /// Convert entity Movie object to protobuf Movie object
