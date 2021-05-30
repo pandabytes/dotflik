@@ -15,21 +15,29 @@
     </PackageReference>
   </ItemGroup>
 
+  <!-- Dotflik protobuf files -->
   <ItemGroup>
-    <Protobuf Include="..\protos\dotflik\protobuf\movie\movie_service.proto" GrpcServices="Server" AdditionalImportDirs="..">
+    <Protobuf Include="..\protos\dotflik\protobuf\movie\movie_service.proto"
+              GrpcServices="Server"
+              ProtoRoot="..\protos"
+              AdditionalImportDirs=".">
       <Link>protos\dotflik\protobuf\movie\movie_service.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\protos\dotflik\protobuf\customer\customer_service.proto" GrpcServices="Server" AdditionalImportDirs="..">
-      <Link>protos\dotflik\protobuf\customer\customer_service.proto</Link>
+
+    <Protobuf Include="..\protos\dotflik\protobuf\pagination\pagination.proto" 
+              GrpcServices="None"
+              ProtoRoot="..\protos">
+      <Link>protos\dotflik\protobuf\pagination\pagination.proto</Link>
     </Protobuf>
   </ItemGroup>
 
-  <!--Link to google protobuf files-->
+  <!-- Link to google protobuf files -->
   <ItemGroup>
     <None Include="$(PkgGrpc_Tools)\build\native\include\google\**\*">
       <Link>protos\google\%(RecursiveDir)/%(FileName)%(Extension)</Link>
     </None>
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Dotflik.Infrastructure\Dotflik.Infrastructure.csproj" />
   </ItemGroup>

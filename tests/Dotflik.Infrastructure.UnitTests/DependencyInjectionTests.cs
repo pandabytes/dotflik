@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 
+using Dotflik.Application.Pagination;
 using Dotflik.Application.Repositories;
 using Dotflik.Application.Repositories.Settings;
 
@@ -9,7 +10,7 @@ using Moq;
 
 namespace Dotflik.Infrastructure.UnitTests
 {
-  public class RepositoryServiceTests
+  public class DependencyInjectionTests
   {
     [Fact]
     public void AddMovieRepository_SupportDatabase_MovieRepositoryIsAdded()
@@ -37,7 +38,6 @@ namespace Dotflik.Infrastructure.UnitTests
 
       Assert.Throws<NotSupportedException>(() => services.AddMovieRepository(notSupportedDb));     
     }
-
 
   }
 }

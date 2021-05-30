@@ -12,7 +12,7 @@ namespace Dotflik.Infrastructure
   /// <summary>
   /// Provide methods to add <see cref="IRepository{T}"/> service
   /// </summary>
-  public static class RepositoryService
+  public static class DependencyInjection
   {
     /// <summary>
     /// Add <see cref="IMovieRepository"/> as a scoped service. Ensure <see cref="IDatabaseSettings"/>

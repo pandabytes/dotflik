@@ -2,13 +2,19 @@ syntax = "proto3";
 
 package dotflik.protobuf.movie;
 
+import "dotflik/protobuf/pagination/pagination.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
 
 // Service for handling querying and updating movies
 service MovieService {
-  // List movies with pagination
-  rpc ListMovies(ListMoviesRequest) returns (ListMoviesResponse);
+  // Get the maximum number of movies the server can return in a request.
+  // This number is applied globally to this service, unless a service
+  // method specifies its own max number of movies to return
+  rpc GetMaxPageSize (google.protobuf.Empty) returns (GetMaxPageSizeResponse);
+
+  // List movies using pagination
+  rpc ListMovies(dotflik.protobuf.pagination.PaginationRequest) returns (ListMoviesResponse);
 
   // List movies given a year range
   rpc ListMoviesByYear(ListMoviesByYearRequest) returns (ListMoviesByYearResponse);
@@ -24,7 +30,7 @@ service MovieService {
 //   rpc RateMovie(RateMovieRequest) returns (google.protobuf.Empty);
 }
 
-// Representing a movie data structure
+// Represent a movie data structure
 message Movie {
   string id = 1; // Id of the movie
   string title = 2; // Title of The movie
@@ -33,28 +39,19 @@ message Movie {
   string banner_url = 5; // The url to the movie banner. This can be null
 }
 
-// The request to get movies using pagination
-message ListMoviesRequest {
-  // The number of movies per page to request. The maximum number of movies 
-  // to request is determined by the server. If the request number 
-  // execeeds the maximum number OR the request number <= 0,
-  // then at most maximum number of movies is returned
-  int32 page_size = 1;
-
-  // The page token to request the specific page. Empty token means
-  // requesting the 1st page
-  string page_token = 2;
-}
-
-// The response to get movies using pagination
+// The response of listing movies
 message ListMoviesResponse {
   // List of movies 
   repeated Movie movies = 1;
 
-  // The next page token to use. Use this token to request the next
-  // page of results. If it's empty then it means there is no more
-  // movies to get
-  string next_page_token = 2; 
+  // The respone containing information to
+  // get the next results with pagination
+  pagination.PaginationRespone pagination_response = 2;
+}
+
+// The respone to get the maximum page size
+message GetMaxPageSizeResponse {
+  int32 max_page_size = 1; // Maximum page size
 }
 
 // The request to get the movie by its id

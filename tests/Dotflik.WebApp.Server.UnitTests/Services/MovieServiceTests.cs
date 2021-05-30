@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
+using Dotflik.Protobuf.Pagination;
 using Dotflik.Protobuf.Movie;
 using Grpc.Core;
 
@@ -22,10 +23,14 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
     private readonly MovieService m_movieService;
 
     private readonly Mock<IMovieRepository> m_movieRepositoryMock;
+    private readonly ServerCallContext m_serverContext;
 
     public MovieServiceTests()
     {
       var logger = new Mock<ILogger<MovieService>>().Object;
+
+      m_serverContext = new Mock<ServerCallContext>().Object;
+
       m_movieRepositoryMock = new Mock<IMovieRepository>();
       m_movieService = new MovieService(m_movieRepositoryMock.Object, logger);
     }
@@ -39,11 +44,10 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
                            .Returns(notFoundMovieTask);
 
       var request = new GetMovieByIdRequest { Id = string.Empty };
-      var serverContext = new Mock<ServerCallContext>().Object;
 
       // Act
       var ex = await Assert.ThrowsAsync<RpcException>(
-        () => m_movieService.GetMovieById(request, serverContext));
+        () => m_movieService.GetMovieById(request, m_serverContext));
 
       // Assert
       Assert.Equal(StatusCode.InvalidArgument, ex.StatusCode);
@@ -64,10 +68,9 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
                            .Returns(movieTask);
 
       var request = new GetMovieByIdRequest { Id = string.Empty };
-      var serverContext = new Mock<ServerCallContext>().Object;
 
       // Act
-      var actualProtobufMovie = await m_movieService.GetMovieById(request, serverContext);
+      var actualProtobufMovie = await m_movieService.GetMovieById(request, m_serverContext);
 
       // Assert
       Assert.Equal(expectProtobufMovie, actualProtobufMovie);
@@ -83,11 +86,10 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
                            .Throws(new RepositoryException("dummy exception"));
 
       var request = new GetMovieByIdRequest { Id = string.Empty };
-      var serverContext = new Mock<ServerCallContext>().Object;
 
       // Act
       var ex = await Assert.ThrowsAsync<RpcException>(
-        () => m_movieService.GetMovieById(request, serverContext));
+        () => m_movieService.GetMovieById(request, m_serverContext));
 
       // Assert
       Assert.Equal(StatusCode.Internal, ex.StatusCode);
@@ -102,11 +104,10 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
                            .Returns(notFoundMovieTask);
 
       var request = new GetMovieByTitleRequest { Title = string.Empty };
-      var serverContext = new Mock<ServerCallContext>().Object;
 
       // Act
       var ex = await Assert.ThrowsAsync<RpcException>(
-        () => m_movieService.GetMovieByTitle(request, serverContext));
+        () => m_movieService.GetMovieByTitle(request, m_serverContext));
 
       // Assert
       Assert.Equal(StatusCode.InvalidArgument, ex.StatusCode);
@@ -131,10 +132,9 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
                            .Returns(movieTask);
 
       var request = new GetMovieByTitleRequest { Title = string.Empty };
-      var serverContext = new Mock<ServerCallContext>().Object;
 
       // Act
-      var actualProtobufMovie = await m_movieService.GetMovieByTitle(request, serverContext);
+      var actualProtobufMovie = await m_movieService.GetMovieByTitle(request, m_serverContext);
 
       // Assert
       Assert.Equal(expectProtobufMovie, actualProtobufMovie);
@@ -150,17 +150,57 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
                            .Throws(new RepositoryException("dummy exception"));
 
       var request = new GetMovieByTitleRequest { Title = string.Empty };
-      var serverContext = new Mock<ServerCallContext>().Object;
 
       // Act
       var ex = await Assert.ThrowsAsync<RpcException>(
-        () => m_movieService.GetMovieByTitle(request, serverContext));
+        () => m_movieService.GetMovieByTitle(request, m_serverContext));
 
       // Assert
       Assert.Equal(StatusCode.Internal, ex.StatusCode);
     }
 
+    [Theory]
+    [InlineData("012546")]
+    [InlineData("bad token")]
+    [InlineData("invalid_token")]
+    public async Task ListMovies_InconsistentPageToken_ThrowsRpcExceptionWithInvalidArgument(string token)
+    {
+      // Arrange
+      var request = new PaginationRequest { PageToken = token };
 
+      // Act
+      var ex = await Assert.ThrowsAsync<RpcException>(
+        () => m_movieService.ListMovies(request, m_serverContext));
+
+      // Assert
+      Assert.Equal(StatusCode.InvalidArgument, ex.StatusCode);
+    }
+
+    [Fact]
+    public async Task ListMovies_RepositoryProblem_ThrowsRepositoryExceptionWithInternalError()
+    {
+      // Arrange
+      var movieTask = Task.FromResult<Domain.Entities.Movie?>(null);
+
+      m_movieRepositoryMock.Setup(m => m.GetAllAsync(It.IsAny<int>(), It.IsAny<int>()))
+                           .Throws(new RepositoryException("dummy exception"));
+
+      var request = new ListMoviesRequest();
+
+      // Act
+      var ex = await Assert.ThrowsAsync<RpcException>(
+        () => m_movieService.ListMovies(request, m_serverContext));
+
+      // Assert
+      Assert.Equal(StatusCode.Internal, ex.StatusCode);
+    }
+
+    [Fact]
+    public async Task ListMovies_()
+    {
+      // Arrange
+
+    }
 
   }
 }

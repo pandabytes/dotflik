@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package dotflik.protobuf.pagination;
+
+
+// The request to get movies using pagination
+message PaginationRequest {
+  // The number of movies per page to request. The maximum number of movies 
+  // to request is determined by the server. If the request number 
+  // execeeds the maximum number OR the request number <= 0,
+  // then at most maximum number of movies is returned
+  int32 page_size = 1;
+
+  // The page token to request the specific page. Empty token means
+  // requesting the 1st page. If page_size and page_token are non-empty
+  // and are inconsistent with each other, the request will be
+  // considered invalid
+  string page_token = 2;
+}
+
+// The response to get movies using pagination
+message PaginationRespone {
+  // The next page token to use. Use this token to request the next
+  // page of results. If it's empty then it means there is no more
+  // movies to get
+  string next_page_token = 2; 
+}
