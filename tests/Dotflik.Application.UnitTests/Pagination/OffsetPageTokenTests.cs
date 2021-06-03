@@ -76,6 +76,25 @@ namespace Dotflik.Application.Pagination.UnitTests
       Assert.Equal(expectFormat, offsetPageToken.ToToken());
     }
 
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(-5)]
+    [InlineData(-100)]
+    [InlineData(int.MinValue)]
+    public void LimitProperty_LimitLessThanZero_ThrowsInvalidOperationException(int limit)
+    {
+      Assert.Throws<InvalidOperationException>(() => new OffsetPageToken(limit, 0));
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(-5)]
+    [InlineData(-100)]
+    [InlineData(int.MinValue)]
+    public void OffsetProperty_OffsetLessThanZero_ThrowsInvalidOperationException(int offset)
+    {
+      Assert.Throws<InvalidOperationException>(() => new OffsetPageToken(0, offset));
+    }
   }
 }
 

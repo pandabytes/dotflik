@@ -13,6 +13,10 @@ namespace Dotflik.Application.Pagination
   /// </summary>
   public sealed class OffsetPageToken
   {
+    /// <summary>
+    /// The format that the token will be in
+    /// when calling <see cref="ToToken"/>
+    /// </summary>
     public const string PageTokenFormat = "limit={0}&offset={1}";
 
     /// <summary>
@@ -21,12 +25,62 @@ namespace Dotflik.Application.Pagination
     /// </summary>
     private static readonly string PageTokenRegex = "^" + string.Format(PageTokenFormat, "[0-9]+", "[0-9]+") + "$";
 
-    public int Limit { get; init; }
+    private int m_limit;
 
-    public int Offset { get; init; }
+    private int m_offset;
 
-    public OffsetPageToken() { }
+    /// <summary>
+    /// Get the limit
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the set value is less than 0
+    /// </exception>
+    public int Limit 
+    { 
+      get { return m_limit; }
+      init 
+      {
+        if (value < 0)
+        {
+          throw new InvalidOperationException("Limit must be at least 0");
+        }
+        m_limit = value;
+      }
+    }
 
+    /// <summary>
+    /// Get the offset
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the set value is less than 0
+    /// </exception>
+    public int Offset
+    {
+      get { return m_offset; }
+      init
+      {
+        if (value < 0)
+        {
+          throw new InvalidOperationException("Limit must be at least 0");
+        }
+        m_offset = value;
+      }
+    }
+
+    /// <summary>
+    /// Constructor. Both limit and offset must be at least 0
+    /// </summary>
+    /// <param name="limit">Limit</param>
+    /// <param name="offset">Offset</param>
+    public OffsetPageToken(int limit, int offset)
+      => (Limit, Offset) = (limit, offset);
+
+    /// <summary>
+    /// Construct the offset token object from <paramref name="pageToken"/>.
+    /// Both limit and offset must be at least 0
+    /// </summary>
+    /// <param name="pageToken">Page token in the format <see cref="PageTokenFormat"/>
+    /// </param>
     public OffsetPageToken(string pageToken)
     {
       if (string.IsNullOrWhiteSpace(pageToken))

@@ -60,7 +60,9 @@ namespace Dotflik.WebApp.Server.Services
         // limit can be safely ignored since we'll use pageSize instead
         if (pageSize != limit && offset != 0)
         {
-          throw new ArgumentException("page token is not consistent with page size.");
+          throw new ArgumentException(@"Page token is not consistent with page size.
+            Please make sure to use the token from the service response. 
+            Otherwise set page token to empty.");
         }
 
         // This check verifies whether the offset in the token is consistent
@@ -104,7 +106,7 @@ namespace Dotflik.WebApp.Server.Services
       var nextPageToken = string.Empty;
       if (movies.Count() >= pageSize)
       {
-        var nextOffsetPageToken = new OffsetPageToken { Limit = pageSize, Offset = offset + pageSize };
+        var nextOffsetPageToken = new OffsetPageToken(pageSize, offset + pageSize);
         nextPageToken = nextOffsetPageToken.ToToken();
       }
 
