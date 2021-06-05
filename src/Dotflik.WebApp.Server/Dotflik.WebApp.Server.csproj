@@ -17,7 +17,7 @@
 
   <!-- Dotflik protobuf files -->
   <ItemGroup>
-    <Protobuf Include="..\protos\dotflik\protobuf\movie\movie_service.proto" GrpcServices="Server" ProtoRoot="..\protos" AdditionalImportDirs=".">
+    <Protobuf Include="..\protos\dotflik\protobuf\movie\movie_service.proto" GrpcServices="Server" ProtoRoot="..\protos">
       <Link>protos\dotflik\protobuf\movie\movie_service.proto</Link>
     </Protobuf>
 
