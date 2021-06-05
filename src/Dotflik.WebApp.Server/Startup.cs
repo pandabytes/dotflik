@@ -21,6 +21,8 @@ namespace Dotflik.WebApp.Server
 {
   public class Startup
   {
+    private const string AllowAllCorsPolicy = "AllowAll";
+
     public IConfiguration Configuration { get; }
 
     public Startup(IConfiguration configuration)
@@ -39,10 +41,19 @@ namespace Dotflik.WebApp.Server
       });
       services.AddGrpcReflection();
 
+      services.AddCors(o => o.AddPolicy(AllowAllCorsPolicy, builder =>
+      {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader()
+               .WithExposedHeaders("Grpc-Status", "Grpc-Message", "Grpc-Encoding", "Grpc-Accept-Encoding");
+      }));
+
       var dbSettings = ValidateDataAnnotations<PostgresDbSettings>(Configuration, PostgresDbSettings.SectionKey);
       services.AddSingleton<IDatabaseSettings>(dbSettings);
 
       services.AddMovieRepository(Database.PostgresSQL);
+
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,10 +65,14 @@ namespace Dotflik.WebApp.Server
       }
 
       app.UseRouting();
+      app.UseGrpcWeb();
+      app.UseCors();
 
       app.UseEndpoints(endpoints =>
       {
-        endpoints.MapGrpcService<MovieService>();
+        endpoints.MapGrpcService<MovieService>()
+                 .EnableGrpcWeb()
+                 .RequireCors(AllowAllCorsPolicy);
 
         endpoints.MapGet("/", async context =>
         {
@@ -68,7 +83,6 @@ namespace Dotflik.WebApp.Server
         {
           endpoints.MapGrpcReflectionService();
         }
-
       });
     }
 
