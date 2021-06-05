@@ -1,0 +1,28 @@
+﻿@page "/"
+
+<h3>MainPage</h3>
+
+<div class="card-columns">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">random</h5>
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">random</h5>
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">random</h5>
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">random</h5>
+    </div>
+
+  </div>
+</div>
+
+@code {
+
+}

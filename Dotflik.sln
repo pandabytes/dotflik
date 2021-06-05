@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotflik.Infrastructure.Unit
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotflik.WebApp.Server.UnitTests", "tests\Dotflik.WebApp.Server.UnitTests\Dotflik.WebApp.Server.UnitTests.csproj", "{91CE49D2-63D7-4041-8FC6-B9E147CF5428}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotflik.WebApp.Client", "src\Dotflik.WebApp.Client\Dotflik.WebApp.Client.csproj", "{A46138F7-05C7-424F-A662-208FFD78CBCE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{91CE49D2-63D7-4041-8FC6-B9E147CF5428}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91CE49D2-63D7-4041-8FC6-B9E147CF5428}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91CE49D2-63D7-4041-8FC6-B9E147CF5428}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A46138F7-05C7-424F-A662-208FFD78CBCE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A46138F7-05C7-424F-A662-208FFD78CBCE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A46138F7-05C7-424F-A662-208FFD78CBCE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A46138F7-05C7-424F-A662-208FFD78CBCE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -67,6 +73,7 @@ Global
 		{4F56D03D-6897-4B14-9B9B-9D610C959510} = {F168BD2A-413F-441C-AA7F-29A75284BB10}
 		{01F8B1C8-19AC-4CAC-B9A7-8F75FC75FB52} = {F168BD2A-413F-441C-AA7F-29A75284BB10}
 		{91CE49D2-63D7-4041-8FC6-B9E147CF5428} = {F168BD2A-413F-441C-AA7F-29A75284BB10}
+		{A46138F7-05C7-424F-A662-208FFD78CBCE} = {98B705CB-2ED3-47C6-A0EF-3AD697F8A1F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A9ED0A4-9222-4DAC-BE18-3B1737312F8C}
