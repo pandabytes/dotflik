@@ -20,7 +20,7 @@ def insertBanner(dbName: str, user: str, password: str,
 
       if "cover url" in movie:
         bannerUrl = movie["cover url"]
-        cur.execute(f"UPDATE movies SET bannerUrl = '{bannerUrl}' where id = '{movieId}'")
+        cur.execute(f"UPDATE movies SET bannerUrl = '{bannerUrl}' WHERE id = '{movieId}'")
         print(f"{i+1} - Updated movie \"{movieId}\" {bannerUrl}")
       else:
         print(f"{i+1} - Movie \"{movieId}\" has no banner")
@@ -41,7 +41,7 @@ def insertHeadshot(dbName: str, user: str, password: str,
 
       if "headshot" in star:
         headshotUrl = star["headshot"]
-        cur.execute(f"UPDATE stars SET headshot = '{headshotUrl}' where id = '{starId}'")
+        cur.execute(f"UPDATE stars SET headshot = '{headshotUrl}' WHERE id = '{starId}'")
         print(f"{i+1} - Updated star \"{starId}\" {headshotUrl}")
       else:
         print(f"{i+1} - Star \"{starId}\" has no headshot")
