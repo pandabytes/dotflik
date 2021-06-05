@@ -50,6 +50,7 @@ namespace Dotflik.Infrastructure.Repositories
         await connection.OpenAsync();
 
         var movies = await connection.QueryAsync<Movie>(sql, parameters);
+
         return movies;
       }
       catch (Exception ex) when

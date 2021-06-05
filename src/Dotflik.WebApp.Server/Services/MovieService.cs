@@ -24,7 +24,6 @@ namespace Dotflik.WebApp.Server.Services
   public class MovieService : Protobuf.Movie.MovieService.MovieServiceBase
   {
     protected const int MaxPageSize = 50;
-    protected const string PageTokenFormat = "limit={0}&offset={1}";
 
     private readonly ILogger<MovieService> m_logger;
     private readonly IMovieRepository m_movieRepository;
@@ -48,63 +47,21 @@ namespace Dotflik.WebApp.Server.Services
     {
       var (pageSize, pageToken) = (request.PageSize, request.PageToken);
 
-      IEnumerable<Domain.Entities.Movie> movies;
-      int limit, offset;
-      try
+      var offsetPageToken = new OffsetPageToken(pageToken);
+      var (limit, offset) = (offsetPageToken.Limit, offsetPageToken.Offset);
+
+      // Constraint the page size to be within max range
+      if (pageSize > MaxPageSize || pageSize == 0)
       {
-        var offsetPageToken = new OffsetPageToken(pageToken);
-        (limit, offset) = (offsetPageToken.Limit, offsetPageToken.Offset);
-
-        // Ensure the page size and limit in the token are consistent
-        // If offset is 0, it means we're getting results for 1st page and
-        // limit can be safely ignored since we'll use pageSize instead
-        if (pageSize != limit && offset != 0)
-        {
-          throw new ArgumentException(@"Page token is not consistent with page size.
-            Please make sure to use the token from the service response. 
-            Otherwise set page token to empty.");
-        }
-
-        // This check verifies whether the offset in the token is consistent
-        // with the limit. The logic here is the limit should always be divisible
-        // by the offset and if it's false, then the client is not being
-        // consistent with the request
-        if (offset > 0 && offset % limit != 0)
-        {
-          throw new ArgumentException(@"Bad page token value. Please make sure to use the 
-            token from the service response. Otherwise set page token to empty.");
-        }
-
-        // Constraint the page size to be within max range
-        if (pageSize > MaxPageSize || pageSize == 0)
-        {
-          pageSize = MaxPageSize;
-        }
-
-        movies = await m_movieRepository.GetAllAsync(pageSize, offset);
+        pageSize = MaxPageSize;
       }
-      catch (Exception ex)
-      {
-        if (ex is BadPageTokenFormatException || ex is ArgumentException)
-        {
-          var status = new Status(StatusCode.InvalidArgument, ex.Message);
-          throw new RpcException(status);
-        }
-        else if (ex is RepositoryException)
-        {
-          var status = new Status(StatusCode.Internal, "Something has gone wrong with getting movies from database.");
-          throw new RpcException(status);
-        }
 
-        // If it reaches here, it means something unexpected happened
-        m_logger.LogError(ex.ToString());
-        throw;
-      }
+      var movies = await m_movieRepository.GetAllAsync(pageSize, offset);
 
       // If the returned movies count is less than the page size, then it means
-      // there is no more movies to get so set the next page token to empty
+      // there is no more movies to get, so set the next page token to empty
       var nextPageToken = string.Empty;
-      if (movies.Count() >= pageSize)
+      if (movies.Count() == pageSize)
       {
         var nextOffsetPageToken = new OffsetPageToken(pageSize, offset + pageSize);
         nextPageToken = nextOffsetPageToken.ToToken();

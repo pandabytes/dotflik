@@ -39,7 +39,7 @@ namespace Dotflik.Application.Pagination.UnitTests
     public void Constructor_InvalidPageTokenFormat_ThrowsBadPageTokenFormatException(string pageToken)
     {
       // Assert
-      Assert.Throws<BadPageTokenFormatException>(() => new OffsetPageToken(pageToken));
+      Assert.Throws<PageTokenFormatException>(() => new OffsetPageToken(pageToken));
     }
 
     [Theory]
@@ -62,6 +62,17 @@ namespace Dotflik.Application.Pagination.UnitTests
 
       // Assert
       Assert.Equal(testData.ExpectOffset, offsetPageToken.Offset);
+    }
+
+    [Fact]
+    public void Constructor_EmptyPageToken_LimitAndOffsetAreZeroes()
+    {
+      // Act
+      var offsetPageToken = new OffsetPageToken(string.Empty);
+
+      // Assert
+      Assert.Equal(0, offsetPageToken.Limit);
+      Assert.Equal(0, offsetPageToken.Offset);
     }
 
     [Theory]

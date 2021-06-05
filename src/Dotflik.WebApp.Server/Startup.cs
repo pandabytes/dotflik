@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Dotflik.Application.Repositories;
 using Dotflik.Application.Repositories.Settings;
 using Dotflik.Infrastructure;
+using Dotflik.WebApp.Server.Interceptors;
 using Dotflik.WebApp.Server.Services;
 using Dotflik.WebApp.Server.Models;
 
@@ -31,7 +32,11 @@ namespace Dotflik.WebApp.Server
     // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
     public void ConfigureServices(IServiceCollection services)
     {
-      services.AddGrpc();
+      services.AddGrpc(options => {
+        // Order matters
+        options.Interceptors.Add<GlobalExceptionInterceptor>();
+        options.Interceptors.Add<PaginationRequestInterceptor>();
+      });
       services.AddGrpcReflection();
 
       var dbSettings = ValidateDataAnnotations<PostgresDbSettings>(Configuration, PostgresDbSettings.SectionKey);

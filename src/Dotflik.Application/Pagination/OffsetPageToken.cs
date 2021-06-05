@@ -77,8 +77,14 @@ namespace Dotflik.Application.Pagination
 
     /// <summary>
     /// Construct the offset token object from <paramref name="pageToken"/>.
-    /// Both limit and offset must be at least 0
     /// </summary>
+    /// <remarks>
+    /// Both limit and offset must be at least 0. If <paramref name="pageToken"/>
+    /// is empty, then limit and offset will be set to 0
+    /// </remarks>
+    /// <exception cref="PageTokenFormatException">
+    /// Thrown when <paramref name="pageToken"/> is not in the correct format
+    /// </exception>
     /// <param name="pageToken">Page token in the format <see cref="PageTokenFormat"/>
     /// </param>
     public OffsetPageToken(string pageToken)
@@ -92,7 +98,7 @@ namespace Dotflik.Application.Pagination
       if (!Regex.IsMatch(pageToken, PageTokenRegex))
       {
         var errorMessage = $"Token '{pageToken}' is not in correct format '{PageTokenRegex}'.";
-        throw new BadPageTokenFormatException(errorMessage);
+        throw new PageTokenFormatException(errorMessage);
       }
 
       var tokens = pageToken.Split('&');
