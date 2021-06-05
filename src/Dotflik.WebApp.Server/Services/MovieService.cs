@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using Google.Protobuf.WellKnownTypes;
@@ -13,7 +12,6 @@ using Dotflik.Protobuf.Pagination;
 
 using Dotflik.Application.Pagination;
 using Dotflik.Application.Repositories;
-using Dotflik.Domain.Exceptions;
 using Dotflik.WebApp.Server.Mappings;
 
 namespace Dotflik.WebApp.Server.Services
@@ -79,48 +77,24 @@ namespace Dotflik.WebApp.Server.Services
     public override async Task<Movie> GetMovieById(GetMovieByIdRequest request, ServerCallContext context)
     {
       var id = request.Id;
-      try
+      var movie = await m_movieRepository.GetByIdAsync(id);
+      if (movie == null)
       {
-        var movie = await m_movieRepository.GetByIdAsync(id);
-        if (movie == null)
-        {
-          var status = new Status(StatusCode.InvalidArgument, $"Unable to find movie with id {id}");
-          throw new RpcException(status);
-        }
-
-        return movie.ToProtobuf();
+        throw new ArgumentException($"Unable to find movie with id \"{id}\"");
       }
-      catch (RepositoryException ex)
-      {
-        m_logger.LogError(ex.ToString());
-
-        var status = new Status(StatusCode.Internal, $"Something has gone wrong with getting movie with id={id} from database");
-        throw new RpcException(status);
-      }
+      return movie.ToProtobuf();
     }
 
     /// <inheritdoc/>
     public override async Task<Movie> GetMovieByTitle(GetMovieByTitleRequest request, ServerCallContext context)
     {
       var title = request.Title;
-      try
+      var movie = await m_movieRepository.GetByTitleAsync(request.Title);
+      if (movie == null)
       {
-        var movie = await m_movieRepository.GetByTitleAsync(title);
-        if (movie == null)
-        {
-          var status = new Status(StatusCode.InvalidArgument, $"Unable to find movie with title \"{title}\"");
-          throw new RpcException(status);
-        }
-
-        return movie.ToProtobuf();
+        throw new ArgumentException($"Unable to find movie with title \"{title}\"");
       }
-      catch (RepositoryException ex)
-      {
-        m_logger.LogError(ex.ToString());
-
-        var status = new Status(StatusCode.Internal, $"Something has gone wrong with getting movie with id={title} from database");
-        throw new RpcException(status);
-      }
+      return movie.ToProtobuf();
     }
 
     /// <inheritdoc/>

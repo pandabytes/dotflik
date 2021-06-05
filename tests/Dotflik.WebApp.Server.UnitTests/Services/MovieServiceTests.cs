@@ -9,9 +9,7 @@ using Google.Protobuf.WellKnownTypes;
 
 using Dotflik.Protobuf.Pagination;
 using Dotflik.Protobuf.Movie;
-using Dotflik.Application.Pagination;
 using Dotflik.Application.Repositories;
-using Dotflik.Domain.Exceptions;
 using Dotflik.WebApp.Server.Mappings;
 
 using Bogus;
@@ -22,34 +20,6 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
 {
   public class MovieServiceTests
   {
-    public class PaginationRequestTestData 
-    {
-      public int PageSize { get; init; }
-
-      public OffsetPageToken PageToken { get; init; } = null!;
-    }
-
-    public static readonly TheoryData<PaginationRequestTestData> InconsistentTokens = new()
-    {
-      new PaginationRequestTestData 
-      { 
-        PageSize = 1, 
-        PageToken = new OffsetPageToken(2,1)
-      },
-      new PaginationRequestTestData
-      {
-        PageSize = 10,
-        PageToken = new OffsetPageToken(2,2)
-      },
-      new PaginationRequestTestData
-      {
-        PageSize = 5,
-        PageToken = new OffsetPageToken(4,1)
-      }
-    };
-
-
-
     /// <summary>
     /// Object under test
     /// </summary>
@@ -80,39 +50,32 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
       m_maxPageSize = maxPageSizeRespond.Result.MaxPageSize;
     }
 
-    //[Fact]
+    [Fact]
     public async Task GetMovieById_MovieNotFound_ThrowsRpcExceptionWithInvalidArgument()
     {
       // Arrange
       var notFoundMovieTask = Task.FromResult<Domain.Entities.Movie?>(null);
+      var request = new GetMovieByIdRequest { Id = string.Empty };
+
       m_movieRepositoryMock.Setup(m => m.GetByIdAsync(It.IsAny<string>()))
                            .Returns(notFoundMovieTask);
 
-      var request = new GetMovieByIdRequest { Id = string.Empty };
-
-      // Act
-      var ex = await Assert.ThrowsAsync<RpcException>(
+      // Act and Assert
+      await Assert.ThrowsAsync<ArgumentException>(
         () => m_movieService.GetMovieById(request, m_serverContext));
-
-      // Assert
-      Assert.Equal(StatusCode.InvalidArgument, ex.StatusCode);
     }
 
-    //[Fact]
+    [Fact]
     public async Task GetMovieById_MovieFound_ReturnsProtobufMovie()
     {
       // Arrange
-      var movie = new Domain.Entities.Movie() { 
-        Id = "00AAB", Director="Hans Zimmerman",
-        Year = 1990, Title = "Cotton Candy", BannerUrl = "https://movie.com"
-      };
+      var movie = GenerateFakeMovies(1)[0];
       var expectProtobufMovie = movie.ToProtobuf();
       var movieTask = Task.FromResult<Domain.Entities.Movie?>(movie);
+      var request = new GetMovieByIdRequest { Id = string.Empty };
 
       m_movieRepositoryMock.Setup(m => m.GetByIdAsync(It.IsAny<string>()))
                            .Returns(movieTask);
-
-      var request = new GetMovieByIdRequest { Id = string.Empty };
 
       // Act
       var actualProtobufMovie = await m_movieService.GetMovieById(request, m_serverContext);
@@ -121,87 +84,38 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
       Assert.Equal(expectProtobufMovie, actualProtobufMovie);
     }
 
-    //[Fact]
-    public async Task GetMovieById_RepositoryProblem_ThrowsRepositoryExceptionWithInternalError()
-    {
-      // Arrange
-      var movieTask = Task.FromResult<Domain.Entities.Movie?>(null);
-
-      m_movieRepositoryMock.Setup(m => m.GetByIdAsync(It.IsAny<string>()))
-                           .Throws(new RepositoryException("dummy exception"));
-
-      var request = new GetMovieByIdRequest { Id = string.Empty };
-
-      // Act
-      var ex = await Assert.ThrowsAsync<RpcException>(
-        () => m_movieService.GetMovieById(request, m_serverContext));
-
-      // Assert
-      Assert.Equal(StatusCode.Internal, ex.StatusCode);
-    }
-
-    //[Fact]
+    [Fact]
     public async Task GetMovieByTitle_MovieNotFound_ThrowsRpcExceptionWithInvalidArgument()
     {
       // Arrange
       var notFoundMovieTask = Task.FromResult<Domain.Entities.Movie?>(null);
+      var request = new GetMovieByTitleRequest { Title = string.Empty };
+
       m_movieRepositoryMock.Setup(m => m.GetByTitleAsync(It.IsAny<string>()))
                            .Returns(notFoundMovieTask);
 
-      var request = new GetMovieByTitleRequest { Title = string.Empty };
-
-      // Act
-      var ex = await Assert.ThrowsAsync<RpcException>(
+      // Act and Assert
+      await Assert.ThrowsAsync<ArgumentException>(
         () => m_movieService.GetMovieByTitle(request, m_serverContext));
-
-      // Assert
-      Assert.Equal(StatusCode.InvalidArgument, ex.StatusCode);
     }
 
-    //[Fact]
+    [Fact]
     public async Task GetMovieByTitle_MovieFound_ReturnsProtobufMovie()
     {
       // Arrange
-      var movie = new Domain.Entities.Movie()
-      {
-        Id = "00AAB",
-        Director = "Hans Zimmerman",
-        Year = 1990,
-        Title = "Cotton Candy",
-        BannerUrl = "https://movie.com"
-      };
+      var movie = GenerateFakeMovies(1)[0];
       var expectProtobufMovie = movie.ToProtobuf();
       var movieTask = Task.FromResult<Domain.Entities.Movie?>(movie);
+      var request = new GetMovieByTitleRequest { Title = string.Empty };
 
       m_movieRepositoryMock.Setup(m => m.GetByTitleAsync(It.IsAny<string>()))
                            .Returns(movieTask);
-
-      var request = new GetMovieByTitleRequest { Title = string.Empty };
 
       // Act
       var actualProtobufMovie = await m_movieService.GetMovieByTitle(request, m_serverContext);
 
       // Assert
       Assert.Equal(expectProtobufMovie, actualProtobufMovie);
-    }
-
-    //[Fact]
-    public async Task GetMovieByTitle_RepositoryProblem_ThrowsRepositoryExceptionWithInternalError()
-    {
-      // Arrange
-      var movieTask = Task.FromResult<Domain.Entities.Movie?>(null);
-
-      m_movieRepositoryMock.Setup(m => m.GetByTitleAsync(It.IsAny<string>()))
-                           .Throws(new RepositoryException("dummy exception"));
-
-      var request = new GetMovieByTitleRequest { Title = string.Empty };
-
-      // Act
-      var ex = await Assert.ThrowsAsync<RpcException>(
-        () => m_movieService.GetMovieByTitle(request, m_serverContext));
-
-      // Assert
-      Assert.Equal(StatusCode.Internal, ex.StatusCode);
     }
 
     [Fact]
