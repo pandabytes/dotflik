@@ -10,7 +10,7 @@ using Dotflik.Infrastructure.Repositories;
 namespace Dotflik.Infrastructure
 {
   /// <summary>
-  /// Provide methods to add <see cref="IRepository{T}"/> service
+  /// Provide methods to add <see cref="IWriteOnlyRepository{T}"/> service
   /// </summary>
   public static class DependencyInjection
   {
@@ -31,6 +31,31 @@ namespace Dotflik.Infrastructure
       {
         case Database.PostgresSQL:
           services.AddScoped<IMovieRepository, MoviePostgresRepository>();
+          break;
+        default:
+          throw new NotSupportedException($"Database {database} is not supported yet");
+      }
+
+      return services;
+    }
+
+    /// <summary>
+    /// Add <see cref="IGenreRepository"/> as a scoped service. Ensure <see cref="IDatabaseSettings"/>
+    /// is also registered, otherwise an exception will be thrown when trying to
+    /// create the movie repository service
+    /// </summary>
+    /// <exception cref="NotSupportedException">
+    /// Thrown when <paramref name="database"/> is not supported yet
+    /// </exception>
+    /// <param name="services"></param>
+    /// <param name="database">The database that is used to store <see cref="Genre"/></param>
+    /// <returns>Services</returns>
+    public static IServiceCollection AddGenreRepository(this IServiceCollection services, Database database)
+    {
+      switch (database)
+      {
+        case Database.PostgresSQL:
+          services.AddScoped<IGenreRepository, GenrePostgresRepository>();
           break;
         default:
           throw new NotSupportedException($"Database {database} is not supported yet");

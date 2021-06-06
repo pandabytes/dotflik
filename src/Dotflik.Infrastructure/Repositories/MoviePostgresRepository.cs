@@ -23,23 +23,8 @@ namespace Dotflik.Infrastructure.Repositories
     public MoviePostgresRepository(IDatabaseSettings dbSettings) : base(dbSettings)
     { }
 
-    async Task IRepository<Movie>.CreateAsync(Movie entity)
-    {
-      throw new NotImplementedException();
-    }
-
-    async Task IRepository<Movie>.DeleteAsync(int id)
-    {
-      throw new NotImplementedException();
-    }
-
-    async Task IRepository<Movie>.DeleteAsync(string id)
-    {
-      throw new NotImplementedException();
-    }
-
     /// <inheritdoc/> 
-    async Task<IEnumerable<Movie>> IRepository<Movie>.GetAllAsync(int limit, int offset)
+    async Task<IEnumerable<Movie>> IReadOnlyRepository<Movie>.GetAllAsync(int limit, int offset)
     {
       var parameters = new { Limit = limit, Offset = offset };
       var sql = $"SELECT * FROM {RepositoryName} ORDER BY id LIMIT @Limit OFFSET @Offset";
@@ -60,13 +45,8 @@ namespace Dotflik.Infrastructure.Repositories
       }
     }
 
-    async Task<Movie?> IRepository<Movie>.GetByIdAsync(int id)
-    {
-      throw new NotImplementedException();
-    }
-
     /// <inheritdoc/>
-    async Task<Movie?> IRepository<Movie>.GetByIdAsync(string id)
+    async Task<Movie?> IMovieRepository.GetByIdAsync(string id)
     {
       var parameters = new { Id = id };
       var sql = $"SELECT * FROM {RepositoryName} WHERE id = @Id";
@@ -85,11 +65,6 @@ namespace Dotflik.Infrastructure.Repositories
       {
         throw new RepositoryException($"Fail to get movie with id={id}", ex);
       }
-    }
-
-    async Task IRepository<Movie>.UpdateAsync(Movie entity)
-    {
-      throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
@@ -145,7 +120,6 @@ namespace Dotflik.Infrastructure.Repositories
         throw new RepositoryException(errorMessage, ex);
       }
     }
-
 
   }
 }

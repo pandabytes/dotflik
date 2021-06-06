@@ -8,8 +8,15 @@ namespace Dotflik.Application.Repositories
   /// <summary>
   /// Interface for interacting with the <see cref="Movie"/> repository
   /// </summary>
-  public interface IMovieRepository : IRepository<Movie>
+  public interface IMovieRepository : IReadOnlyRepository<Movie>
   {
+    /// <summary>
+    /// Get an entity <typeparamref name="T"/> by id asynchronously
+    /// </summary>
+    /// <param name="id">Id of the genre</param>
+    /// <returns>Movie object or null if not found</returns>
+    Task<Movie?> GetByIdAsync(string id);
+
     /// <summary>
     /// Get a movie by its title asynchronously
     /// </summary>

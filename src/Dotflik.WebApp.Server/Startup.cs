@@ -52,8 +52,8 @@ namespace Dotflik.WebApp.Server
       var dbSettings = ValidateDataAnnotations<PostgresDbSettings>(Configuration, PostgresDbSettings.SectionKey);
       services.AddSingleton<IDatabaseSettings>(dbSettings);
 
-      services.AddMovieRepository(Database.PostgresSQL);
-
+      services.AddMovieRepository(Database.PostgresSQL)
+              .AddGenreRepository(Database.PostgresSQL);
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
