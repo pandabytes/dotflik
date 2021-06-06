@@ -8,7 +8,7 @@ namespace Dotflik.WebApp.Server.Models
   /// <summary>
   /// Containing database settings for PostgresSQL
   /// </summary>
-  public class PostgresDbSettings : IDatabaseSettings
+  public class PostgresDbSettings : DatabaseSettings
   {
     /// <summary>
     /// Define where this settings can be found in <see cref="IConfiguration"/>
@@ -16,8 +16,10 @@ namespace Dotflik.WebApp.Server.Models
     public static readonly string SectionKey = "DatabaseSettings";
 
     /// <inheritdoc/>
-    string IDatabaseSettings.ConnectionString
-      => $"Host={Host};Port={Port};Username={Username};Password={Password};Database={Database}";
+    public override string ConnectionString
+    { 
+      get => $"Host={Host};Port={Port};Username={Username};Password={Password};Database={Database}"; 
+    }
 
     [Required]
     public string Database { get; init; } = string.Empty;

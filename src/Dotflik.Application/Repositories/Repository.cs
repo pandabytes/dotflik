@@ -12,7 +12,7 @@ namespace Dotflik.Application.Repositories
     /// <summary>
     /// Reference to a database settings
     /// </summary>
-    protected readonly IDatabaseSettings m_dbSettings;
+    protected readonly DatabaseSettings m_dbSettings;
 
     /// <summary>
     /// Name of the repository
@@ -27,7 +27,7 @@ namespace Dotflik.Application.Repositories
     /// empty connection string
     /// </exception>
     /// <param name="dbSettings">The database settings object</param>
-    public Repository(IDatabaseSettings dbSettings)
+    public Repository(DatabaseSettings dbSettings)
     {
       if (string.IsNullOrWhiteSpace(dbSettings.ConnectionString))
       {

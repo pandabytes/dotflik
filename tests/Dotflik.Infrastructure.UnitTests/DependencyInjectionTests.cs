@@ -15,7 +15,7 @@ namespace Dotflik.Infrastructure.UnitTests
     public void AddMovieRepository_SupportDatabase_MovieRepositoryIsAdded()
     {
       // Arrange
-      var dbSettingsMock = new Mock<IDatabaseSettings>();
+      var dbSettingsMock = new Mock<DatabaseSettings>();
       dbSettingsMock.SetupGet(m => m.ConnectionString).Returns("dummy");
       var services = new ServiceCollection();
 
@@ -44,7 +44,7 @@ namespace Dotflik.Infrastructure.UnitTests
     public void AddGenreRepository_SupportDatabase_GenreRepositoryIsAdded()
     {
       // Arrange
-      var dbSettingsMock = new Mock<IDatabaseSettings>();
+      var dbSettingsMock = new Mock<DatabaseSettings>();
       dbSettingsMock.SetupGet(m => m.ConnectionString).Returns("dummy");
       var services = new ServiceCollection();
 

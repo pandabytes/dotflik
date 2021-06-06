@@ -50,7 +50,7 @@ namespace Dotflik.WebApp.Server
       }));
 
       var dbSettings = ValidateDataAnnotations<PostgresDbSettings>(Configuration, PostgresDbSettings.SectionKey);
-      services.AddSingleton<IDatabaseSettings>(dbSettings);
+      services.AddSingleton<DatabaseSettings>(dbSettings);
 
       services.AddMovieRepository(Database.PostgresSQL)
               .AddGenreRepository(Database.PostgresSQL);

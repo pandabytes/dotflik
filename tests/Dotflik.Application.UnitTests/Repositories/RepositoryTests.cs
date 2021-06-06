@@ -14,7 +14,7 @@ namespace Dotflik.Application.Repositories.UnitTests
     [InlineData(" ")]
     public void Constructor_EmptyConnectionString_ThrowsArgumentException(string connectionString)
     {
-      var dbSettingsMock = new Mock<IDatabaseSettings>();
+      var dbSettingsMock = new Mock<DatabaseSettings>();
       dbSettingsMock.SetupGet(m => m.ConnectionString).Returns(connectionString);
 
       // Outer exception is thrown by Xunit to assert the inner exception instead
@@ -31,7 +31,7 @@ namespace Dotflik.Application.Repositories.UnitTests
     [InlineData("x 0")]
     public void Constructor_NonEmptyConnectionString_RepositoryCanBeConstructed(string connectionString)
     {
-      var dbSettingsMock = new Mock<IDatabaseSettings>();
+      var dbSettingsMock = new Mock<DatabaseSettings>();
       dbSettingsMock.SetupGet(m => m.ConnectionString).Returns(connectionString);
 
       _ = new Mock<Repository>(dbSettingsMock.Object).Object;

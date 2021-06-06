@@ -20,7 +20,7 @@ namespace Dotflik.Infrastructure.Repositories
     public override string RepositoryName => "movies";
 
     /// <inheritdoc/>
-    public MoviePostgresRepository(IDatabaseSettings dbSettings) : base(dbSettings)
+    public MoviePostgresRepository(DatabaseSettings dbSettings) : base(dbSettings)
     { }
 
     /// <inheritdoc/> 

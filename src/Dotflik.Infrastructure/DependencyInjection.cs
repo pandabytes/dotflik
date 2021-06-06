@@ -15,7 +15,7 @@ namespace Dotflik.Infrastructure
   public static class DependencyInjection
   {
     /// <summary>
-    /// Add <see cref="IMovieRepository"/> as a scoped service. Ensure <see cref="IDatabaseSettings"/>
+    /// Add <see cref="IMovieRepository"/> as a scoped service. Ensure <see cref="DatabaseSettings"/>
     /// is also registered, otherwise an exception will be thrown when trying to
     /// create the movie repository service
     /// </summary>
@@ -40,7 +40,7 @@ namespace Dotflik.Infrastructure
     }
 
     /// <summary>
-    /// Add <see cref="IGenreRepository"/> as a scoped service. Ensure <see cref="IDatabaseSettings"/>
+    /// Add <see cref="IGenreRepository"/> as a scoped service. Ensure <see cref="DatabaseSettings"/>
     /// is also registered, otherwise an exception will be thrown when trying to
     /// create the movie repository service
     /// </summary>

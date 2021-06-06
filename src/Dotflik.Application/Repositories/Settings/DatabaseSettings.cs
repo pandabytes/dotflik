@@ -3,14 +3,14 @@
 namespace Dotflik.Application.Repositories.Settings
 {
   /// <summary>
-  /// Interface for database settings
+  /// Base class for database settings
   /// </summary>
-  public interface IDatabaseSettings
+  public abstract class DatabaseSettings
   {
     /// <summary>
     /// Connection string to a database. This string is 
     /// dependent on whichever database is used
     /// </summary>
-    string ConnectionString { get; }
+    public abstract string ConnectionString { get; }
   }
 }

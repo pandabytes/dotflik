@@ -14,7 +14,7 @@ namespace Dotflik.Infrastructure.Repositories
   {
     public override string RepositoryName => "genres";
 
-    public GenrePostgresRepository(IDatabaseSettings dbSettings) : base(dbSettings) { }
+    public GenrePostgresRepository(DatabaseSettings dbSettings) : base(dbSettings) { }
 
     Task<IEnumerable<Genre>> IReadOnlyRepository<Genre>.GetAllAsync(int limit, int offset)
     {
