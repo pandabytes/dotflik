@@ -27,7 +27,7 @@ namespace Dotflik.WebApp.Client
         {
           HttpHandler = new GrpcWebHandler(new HttpClientHandler())
         });
-
+        
         return new MovieService.MovieServiceClient(channel);
       });
 

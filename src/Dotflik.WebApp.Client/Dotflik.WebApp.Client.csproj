@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <!--Temporarily disable nullable setting-->
-    <Nullable>disable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

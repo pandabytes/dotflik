@@ -1,54 +1,62 @@
 ﻿@page "/"
 @using System.Collections.Generic;
+@using Grpc.Core;
 @inject MovieService.MovieServiceClient MovieService
 
 <h3>Main Page</h3>
 
-@if (m_movies != null)
+@if (m_errorOccurred)
 {
-  <select name="Number of movies" @onchange="PageSizeUpdateHandler">
-    <option value="5">5</option>
-    <option value="10">10</option>
-    <option value="20">20</option>
-    <option value="50">50</option>
-  </select>
+  <Error></Error>
+}
+else
+{
+  @if (m_movies != null)
+  {
+    <select name="Number of movies" @onchange="PageSizeUpdateHandler">
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+    </select>
 
-  <div class="card-columns">
-    @foreach (var movie in m_movies)
-    {
-      <div class="card" style="width: 17rem;">
-        <img class="card-img-top" src="@GetBannerUrl(movie)">
+    <div class="card-columns">
+      @foreach (var movie in m_movies)
+      {
+        <div class="card" style="width: 17rem;">
+          <img class="card-img-top" src="@GetBannerUrl(movie)">
 
-        <div class="card-body">
-          <h3 class="card-title">@movie.Title</h3>
-          <h5 class="card-subtitle">@movie.Year</h5>
+          <div class="card-body">
+            <h3 class="card-title">@movie.Title</h3>
+            <h5 class="card-subtitle">@movie.Year</h5>
+          </div>
+
+          <div class="card-footer">
+          <small class="text-muted">
+            <button class="btn btn-primary">
+              More Info
+            </button>
+          </small>
         </div>
 
-        <div class="card-footer">
-        <small class="text-muted">
-          <button class="btn btn-primary">
-            More Info
-          </button>
-        </small>
-      </div>
-
-      </div>
-    }
-  </div>
+        </div>
+      }
+    </div>
+  }
+  else
+  {
+    <Loading></Loading>
+  }
 }
 
 @code 
 { 
-  private int PageSize { get; set; }
-  private List<Movie> m_movies;
+  private bool m_errorOccurred;
+  private List<Movie>? m_movies;
 
   protected async override Task OnInitializedAsync()
   {
-    var request = new PaginationRequest { PageSize = 5 };
-    var response = await MovieService.ListMoviesAsync(request);
-
-    m_movies = new List<Movie>();
-    m_movies.AddRange(response.Movies);
+    await GetMovies(5);
   }
 
   /// <summary>
@@ -66,12 +74,26 @@
 
   private async Task PageSizeUpdateHandler(ChangeEventArgs events)
   {
-    var pageSize = int.Parse(events.Value.ToString());
-    var request = new PaginationRequest { PageSize = pageSize };
-    var response = await MovieService.ListMoviesAsync(request);
+    int.TryParse(events.Value?.ToString(), out int pageSize);
+    await GetMovies(pageSize);
+  }
 
-    m_movies = new List<Movie>();
-    m_movies.AddRange(response.Movies);
+  private async Task GetMovies(int pageSize)
+  {
+    try
+    {
+      var request = new PaginationRequest { PageSize = pageSize };
+      var response = await MovieService.ListMoviesAsync(request);
+
+      m_movies = new List<Movie>();
+      m_movies.AddRange(response.Movies);
+      m_errorOccurred = false;
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine(ex.Message);
+      m_errorOccurred = true;
+    }
   }
 
 }
