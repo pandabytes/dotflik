@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package dotflik.protobuf.resources;
+
+// Represent a movie genre
+message Genre {
+  int32 id = 1; // Id of the genre
+  string name = 2; // Name of the genre
+}

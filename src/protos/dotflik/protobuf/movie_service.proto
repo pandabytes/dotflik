@@ -1,8 +1,12 @@
 syntax = "proto3";
 
-package dotflik.protobuf.movie;
+package dotflik.protobuf;
 
 import "dotflik/protobuf/pagination/pagination.proto";
+import "dotflik/protobuf/resources/genre.proto";
+import "dotflik/protobuf/resources/movie.proto";
+import "dotflik/protobuf/resources/star.proto";
+
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
 
@@ -20,29 +24,24 @@ service MovieService {
   rpc ListMoviesByYear(ListMoviesByYearRequest) returns (ListMoviesByYearResponse);
 
   // Get a movie by its id
-  rpc GetMovieById(GetMovieByIdRequest) returns (Movie);
+  rpc GetMovieById(GetMovieByIdRequest) returns (MovieAggregate);
 
   // Get a movie by its title
-  rpc GetMovieByTitle(GetMovieByTitleRequest) returns (Movie);  
-
-//   rpc GetMoviesByRating(GetMoviesByRatingRequest) returns (stream Movie);
-
-//   rpc RateMovie(RateMovieRequest) returns (google.protobuf.Empty);
+  rpc GetMovieByTitle(GetMovieByTitleRequest) returns (MovieAggregate);  
 }
 
-// Represent a movie data structure
-message Movie {
-  string id = 1; // Id of the movie
-  string title = 2; // Title of The movie
-  int32 year = 3; // The released year of the movie
-  string director = 4; // The director of the movie
-  string banner_url = 5; // The url to the movie banner. This can be null
+// This message aggregates all the necessary information
+// about a movie to send back to the client
+message MovieAggregate {
+  dotflik.protobuf.resources.Movie movie = 1; // The movie
+  repeated dotflik.protobuf.resources.Genre genres = 2; // The genres associated with the movie
+  repeated dotflik.protobuf.resources.Star stars = 3; // The stars associated with the movie
 }
 
 // The response of listing movies
 message ListMoviesResponse {
   // List of movies 
-  repeated Movie movies = 1;
+  repeated dotflik.protobuf.resources.Movie movies = 1;
 
   // The respone containing information to
   // get the next results with pagination
@@ -95,21 +94,10 @@ message ListMoviesByYearRequest {
 // The response to get movies by year range using pagination
 message ListMoviesByYearResponse {
   // List of movies 
-  repeated Movie movies = 1;
+  repeated dotflik.protobuf.resources.Movie movies = 1;
 
   // The next page token to use. Use this token to request the next
   // page of results. If it's empty then it means there is no more
   // movies to get
   string next_page_token = 2; 
 }
-
-// message RateMovieRequest {
-//   string id = 1;
-//   float rating = 2;
-// }
-
-// message GetMoviesByRatingRequest {
-//   float rating_min = 1;
-//   float rating_max = 2;
-//   google.protobuf.Int32Value limit = 3;
-// }

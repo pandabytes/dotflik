@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package dotflik.protobuf.resources;
+
+import "google/protobuf/wrappers.proto";
+
+// Represent a movie star
+message Star {
+  string id = 1; // Id of the star
+  string name = 2; // Name of the star
+  google.protobuf.Int32Value birth_year = 3; // Birth year of the star. If null, it means it's unavailable
+  string headshot = 4; // Url of the star headshot picture
+}

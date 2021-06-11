@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package dotflik.protobuf.resources;
+
+// Represent a movie
+message Movie {
+  string id = 1; // Id of the movie
+  string title = 2; // Title of The movie
+  int32 year = 3; // The released year of the movie
+  string director = 4; // The director of the movie
+  string banner_url = 5; // The url to the movie banner
+}
