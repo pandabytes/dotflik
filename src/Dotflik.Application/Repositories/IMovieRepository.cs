@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Dotflik.Domain.Entities;
+using Dotflik.Domain.Aggregates;
 
 namespace Dotflik.Application.Repositories
 {
@@ -11,14 +11,14 @@ namespace Dotflik.Application.Repositories
   public interface IMovieRepository : IReadOnlyRepository<Movie>
   {
     /// <summary>
-    /// Get an entity <typeparamref name="T"/> by id asynchronously
+    /// Get a <see cref="Movie"/> by its id asynchronously
     /// </summary>
     /// <param name="id">Id of the genre</param>
     /// <returns>Movie object or null if not found</returns>
     Task<Movie?> GetByIdAsync(string id);
 
     /// <summary>
-    /// Get a movie by its title asynchronously
+    /// Get a <see cref="Movie"/> by its title asynchronously
     /// </summary>
     /// <param name="title">Title of the movie</param>
     /// <returns>Movie object or null if not found</returns>

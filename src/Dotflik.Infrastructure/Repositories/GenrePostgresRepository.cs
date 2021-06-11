@@ -12,8 +12,6 @@ namespace Dotflik.Infrastructure.Repositories
 {
   public class GenrePostgresRepository : Repository, IGenreRepository
   {
-    public override string RepositoryName => "genres";
-
     public GenrePostgresRepository(DatabaseSettings dbSettings) : base(dbSettings) { }
 
     Task<IEnumerable<Genre>> IReadOnlyRepository<Genre>.GetAllAsync(int limit, int offset)
@@ -25,7 +23,7 @@ namespace Dotflik.Infrastructure.Repositories
     async Task<Genre?> IGenreRepository.GetByIdAsync(int id)
     {
       var parameters = new { Id = id };
-      var sql = $"SELECT * FROM {RepositoryName} WHERE id = @Id";
+      var sql = $"SELECT * FROM genres WHERE id = @Id";
 
       try
       {
@@ -47,7 +45,7 @@ namespace Dotflik.Infrastructure.Repositories
     async Task<Genre?> IGenreRepository.GetByNameAsync(string name)
     {
       var parameters = new { Name = name };
-      var sql = $"SELECT * FROM {RepositoryName} WHERE Name = @Id";
+      var sql = $"SELECT * FROM genres WHERE Name = @Id";
 
       try
       {

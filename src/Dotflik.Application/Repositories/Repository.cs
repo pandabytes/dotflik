@@ -15,11 +15,6 @@ namespace Dotflik.Application.Repositories
     protected readonly DatabaseSettings m_dbSettings;
 
     /// <summary>
-    /// Name of the repository
-    /// </summary>
-    public abstract string RepositoryName { get; }
-
-    /// <summary>
     /// Constructor
     /// </summary>
     /// <exception cref="ArgumentException">

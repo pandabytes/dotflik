@@ -7,7 +7,8 @@ using Grpc.Core;
 
 using Microsoft.Extensions.Logging;
 
-using Dotflik.Protobuf.Movie;
+using Dotflik.Protobuf;
+using Dotflik.Protobuf.Resources;
 using Dotflik.Protobuf.Pagination;
 
 using Dotflik.Application.Pagination;
@@ -19,7 +20,7 @@ namespace Dotflik.WebApp.Server.Services
   /// <summary>
   /// gRPC implementation of movie service
   /// </summary>
-  public class MovieService : Protobuf.Movie.MovieService.MovieServiceBase
+  public class MovieService : Protobuf.MovieService.MovieServiceBase
   {
     protected const int MaxPageSize = 50;
 
@@ -37,6 +38,7 @@ namespace Dotflik.WebApp.Server.Services
     public override Task<GetMaxPageSizeResponse> GetMaxPageSize(Empty request, ServerCallContext context)
     {
       var response = new GetMaxPageSizeResponse { MaxPageSize = MaxPageSize };
+      //var m = m_xmovieRepository.GetByIdAsync("tt0496319").Result;
       return Task.FromResult(response);
     }
 
@@ -74,27 +76,37 @@ namespace Dotflik.WebApp.Server.Services
     }
 
     /// <inheritdoc/>
-    public override async Task<Movie> GetMovieById(GetMovieByIdRequest request, ServerCallContext context)
+    public override async Task<MovieAggregate> GetMovieById(GetMovieByIdRequest request, ServerCallContext context)
     {
       var id = request.Id;
       var movie = await m_movieRepository.GetByIdAsync(id);
-      if (movie == null)
+      if (movie is null)
       {
         throw new ArgumentException($"Unable to find movie with id \"{id}\"");
       }
-      return movie.ToProtobuf();
+
+      var response = new MovieAggregate { Movie = movie.ToProtobuf() };
+      response.Stars.AddRange(movie.Stars.Select(s => s.ToProtobuf()));
+      response.Genres.AddRange(movie.Genres.Select(g => g.ToProtobuf()));
+     
+      return response;
     }
 
     /// <inheritdoc/>
-    public override async Task<Movie> GetMovieByTitle(GetMovieByTitleRequest request, ServerCallContext context)
+    public override async Task<MovieAggregate> GetMovieByTitle(GetMovieByTitleRequest request, ServerCallContext context)
     {
       var title = request.Title;
       var movie = await m_movieRepository.GetByTitleAsync(request.Title);
-      if (movie == null)
+      if (movie is null)
       {
         throw new ArgumentException($"Unable to find movie with title \"{title}\"");
       }
-      return movie.ToProtobuf();
+
+      var response = new MovieAggregate { Movie = movie.ToProtobuf() };
+      response.Stars.AddRange(movie.Stars.Select(s => s.ToProtobuf()));
+      response.Genres.AddRange(movie.Genres.Select(g => g.ToProtobuf()));
+
+      return response;
     }
 
     /// <inheritdoc/>
