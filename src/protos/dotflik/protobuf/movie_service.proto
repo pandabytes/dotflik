@@ -41,7 +41,7 @@ message MovieAggregate {
 // The response of listing movies
 message ListMoviesResponse {
   // List of movies 
-  repeated dotflik.protobuf.resources.Movie movies = 1;
+  repeated MovieAggregate movies = 1;
 
   // The respone containing information to
   // get the next results with pagination

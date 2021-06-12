@@ -45,35 +45,35 @@ namespace Dotflik.WebApp.Server.Services
     /// <inheritdoc/>
     public override async Task<ListMoviesResponse> ListMovies(PaginationRequest request, ServerCallContext context)
     {
-      //var (pageSize, pageToken) = (request.PageSize, request.PageToken);
+      var (pageSize, pageToken) = (request.PageSize, request.PageToken);
 
-      //var offsetPageToken = new OffsetPageToken(pageToken);
-      //var (limit, offset) = (offsetPageToken.Limit, offsetPageToken.Offset);
+      var offsetPageToken = new OffsetPageToken(pageToken);
+      var (limit, offset) = (offsetPageToken.Limit, offsetPageToken.Offset);
 
-      //// Constraint the page size to be within max range
-      //if (pageSize > MaxPageSize || pageSize == 0)
-      //{
-      //  pageSize = MaxPageSize;
-      //}
+      // Constraint the page size to be within max range
+      if (pageSize > MaxPageSize || pageSize == 0)
+      {
+        pageSize = MaxPageSize;
+      }
 
-      //var movies = await m_movieRepository.GetAllAsync(pageSize, offset);
+      var movies = await m_movieRepository.GetAllAsync(pageSize, offset);
 
-      //// If the returned movies count is less than the page size, then it means
-      //// there is no more movies to get, so set the next page token to empty
-      //var nextPageToken = string.Empty;
-      //if (movies.Count() == pageSize)
-      //{
-      //  var nextOffsetPageToken = new OffsetPageToken(pageSize, offset + pageSize);
-      //  nextPageToken = nextOffsetPageToken.ToToken();
-      //}
+      // If the returned movies count is less than the page size, then it means
+      // there is no more movies to get, so set the next page token to empty
+      var nextPageToken = string.Empty;
+      if (movies.Count() == pageSize)
+      {
+        var nextOffsetPageToken = new OffsetPageToken(pageSize, offset + pageSize);
+        nextPageToken = nextOffsetPageToken.ToToken();
+      }
 
-      //var paginationResponse = new PaginationRespone { NextPageToken = nextPageToken };
-      //var response = new ListMoviesResponse { PaginationResponse = paginationResponse };
-      //var protobufMovies = movies.Select(m => ((Domain.Entities.Movie)m).ToProtobuf());
-      //response.Movies.AddRange(protobufMovies);
+      var paginationResponse = new PaginationRespone { NextPageToken = nextPageToken };
+      var protobufMovieAggrs = movies.Select(m => m.ToProtobuf());
+      
+      var response = new ListMoviesResponse { PaginationResponse = paginationResponse };
+      response.Movies.AddRange(protobufMovieAggrs);
 
-      //return response;
-      throw new NotImplementedException();
+      return response;
     }
 
     /// <inheritdoc/>

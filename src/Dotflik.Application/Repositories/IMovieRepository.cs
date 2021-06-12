@@ -36,7 +36,7 @@ namespace Dotflik.Application.Repositories
     /// <param name="to">To year</param>
     /// <param name="sortAsc">If true, sort the results in acending order. Else descending order</param>
     /// <returns>Collection of movies</returns>
-    Task<IEnumerable<Movie>> GetMoviesByYear(int limit, int offset, int from, int to, bool sortAsc);
+    Task<IEnumerable<Movie>> GetByYear(int limit, int offset, int from, int to, bool sortAsc);
 
     //Task<IEnumerable<Movie>> GetMoviesByRating(float minRating, float maxRating, int? limit);
   }
