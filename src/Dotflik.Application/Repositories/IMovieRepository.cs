@@ -18,11 +18,12 @@ namespace Dotflik.Application.Repositories
     Task<Movie?> GetByIdAsync(string id);
 
     /// <summary>
-    /// Get a <see cref="Movie"/> by its title asynchronously
+    /// Get a collection of <see cref="Movie"/> that have
+    /// matching title <paramref name="title"/> asynchronously
     /// </summary>
     /// <param name="title">Title of the movie</param>
-    /// <returns>Movie object or null if not found</returns>
-    Task<Movie?> GetByTitleAsync(string title);
+    /// <returns>Collection of movies</returns>
+    Task<IEnumerable<Movie>> GetByTitleAsync(string title);
 
     /// <summary>
     /// Get movies within the year range [<paramref name="from"/>, <paramref name="to"/>]

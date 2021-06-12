@@ -47,59 +47,14 @@ namespace Dotflik.Infrastructure.Repositories
     /// <inheritdoc/>
     async Task<Movie?> IMovieRepository.GetByIdAsync(string id)
     {
-      var parameters = new { Id = id };
-      var sql = @"
-        SELECT m.*, s.*, g.*
-        FROM movies m, stars s, genres g, stars_in_movies sm, genres_in_movies gm
-        WHERE s.id = sm.starId AND m.id = sm.movieId AND
-              g.id = gm.genreId AND m.id = gm.movieId AND
-              m.id = @Id";
       try
       {
-        await using var connection = new NpgsqlConnection(m_dbSettings.ConnectionString);
-        await connection.OpenAsync();
-        
-        var movies = await connection.QueryAsync<Movie, Domain.Entities.Star, 
-                                      Domain.Entities.Genre, Movie>(sql, 
-          (m, s, g) => 
-          {
-            m.Stars.Add(s);
-            m.Genres.Add(g);
-            return m;
-          }, 
-          param: parameters, 
-          splitOn: "id,id");
-
+        var movies =  await GetMovieByAttribute("id", id);
         if (movies.Count() == 0)
         {
           return null;
         }
-
-        var resultMovie = movies.GroupBy(m => m.Id).Select(g =>
-        {
-          // Copy the "entities" properties
-          // Movies are grouped by the movie id, hence all the movie's
-          // properties are the same
-          var groupedMovie = g.First();
-          var movie = new Movie() 
-          {
-            Id = groupedMovie.Id,
-            Title = groupedMovie.Title,
-            Director = groupedMovie.Director,
-            Year = groupedMovie.Year,
-            BannerUrl = groupedMovie.BannerUrl
-          };
-          
-          // Populate the "aggregate" properties
-          var genres = g.Select(m => m.Genres.Single()).ToHashSet();
-          var stars = g.Select(m => m.Stars.Single()).ToHashSet();
-          movie.Genres.AddRange(genres);
-          movie.Stars.AddRange(stars);
-          
-          return movie;
-        }).Single();
-
-        return resultMovie;
+        return movies.Single();
       }
       catch (Exception ex) when
         (ex is PostgresException || ex is NpgsqlException)
@@ -109,26 +64,17 @@ namespace Dotflik.Infrastructure.Repositories
     }
 
     /// <inheritdoc/>
-    async Task<Movie?> IMovieRepository.GetByTitleAsync(string title)
+    async Task<IEnumerable<Movie>> IMovieRepository.GetByTitleAsync(string title)
     {
-      //var parameters = new { Title = title };
-      //var sql = $"SELECT * FROM movies WHERE title = @Title";
-      //try
-      //{
-      //  await using var connection = new NpgsqlConnection(m_dbSettings.ConnectionString);
-      //  await connection.OpenAsync();
-
-      //  // Use Query instead of QuerySingle to avoid InvalidOperationException
-      //  // if the id is not found
-      //  var movies = connection.Query<Movie>(sql, parameters).AsList();
-      //  return movies?.Count == 1 ? movies[0] : null;
-      //}
-      //catch (Exception ex) when
-      //  (ex is PostgresException || ex is NpgsqlException)
-      //{
-      //  throw new RepositoryException($"Fail to get movie with title={title}", ex);
-      //}
-      throw new NotImplementedException();
+      try
+      {
+        return await GetMovieByAttribute("title", title);
+      }
+      catch (Exception ex) when
+        (ex is PostgresException || ex is NpgsqlException)
+      {
+        throw new RepositoryException($"Fail to get movie with title={title}", ex);
+      }
     }
 
     /// <inheritdoc/>
@@ -162,6 +108,66 @@ namespace Dotflik.Infrastructure.Repositories
       //  throw new RepositoryException(errorMessage, ex);
       //}
       throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Get movies by attribute and the attribute value
+    /// </summary>
+    /// <param name="attributeName">Name of the attribute in the SQL table</param>
+    /// <param name="attributeValue">
+    /// Value of the <paramref name="attributeName"/> that
+    /// must be equal to</param>
+    /// <returns>Movies</returns>
+    protected async Task<IEnumerable<Movie>> GetMovieByAttribute(string attributeName, string attributeValue)
+    {
+      var parameter = new { Attribute = attributeValue };
+      var sql = $@"
+        SELECT m.*, s.*, g.*
+        FROM movies m, stars s, genres g, stars_in_movies sm, genres_in_movies gm
+        WHERE s.id = sm.starId AND m.id = sm.movieId AND
+              g.id = gm.genreId AND m.id = gm.movieId AND
+              m.{attributeName} = @Attribute";
+
+      await using var connection = new NpgsqlConnection(m_dbSettings.ConnectionString);
+      await connection.OpenAsync();
+
+      var movies = await connection.QueryAsync<Movie, Domain.Entities.Star,
+                                               Domain.Entities.Genre, Movie>(
+        sql: sql,
+        map: (m, s, g) =>
+        {
+          m.Stars.Add(s);
+          m.Genres.Add(g);
+          return m;
+        },
+        param: parameter,
+        splitOn: "id,id");
+
+      var resultMovies = movies.GroupBy(m => m.Id)
+                                .Select(g =>
+                                {
+                                  // Copy the "entities" properties
+                                  // Movies are grouped by the movie id, hence
+                                  // all the movies' properties are the same
+                                  var groupedMovie = g.First();
+                                  var movie = new Movie()
+                                  {
+                                    Id = groupedMovie.Id,
+                                    Title = groupedMovie.Title,
+                                    Director = groupedMovie.Director,
+                                    Year = groupedMovie.Year,
+                                    BannerUrl = groupedMovie.BannerUrl
+                                  };
+
+                                  // Populate the "aggregate" properties
+                                  var genres = g.Select(m => m.Genres.Single()).ToHashSet();
+                                  var stars = g.Select(m => m.Stars.Single()).ToHashSet();
+                                  movie.Genres.AddRange(genres);
+                                  movie.Stars.AddRange(stars);
+
+                                  return movie;
+                                });
+      return resultMovies;
     }
 
   }

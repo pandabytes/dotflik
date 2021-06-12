@@ -45,34 +45,35 @@ namespace Dotflik.WebApp.Server.Services
     /// <inheritdoc/>
     public override async Task<ListMoviesResponse> ListMovies(PaginationRequest request, ServerCallContext context)
     {
-      var (pageSize, pageToken) = (request.PageSize, request.PageToken);
+      //var (pageSize, pageToken) = (request.PageSize, request.PageToken);
 
-      var offsetPageToken = new OffsetPageToken(pageToken);
-      var (limit, offset) = (offsetPageToken.Limit, offsetPageToken.Offset);
+      //var offsetPageToken = new OffsetPageToken(pageToken);
+      //var (limit, offset) = (offsetPageToken.Limit, offsetPageToken.Offset);
 
-      // Constraint the page size to be within max range
-      if (pageSize > MaxPageSize || pageSize == 0)
-      {
-        pageSize = MaxPageSize;
-      }
+      //// Constraint the page size to be within max range
+      //if (pageSize > MaxPageSize || pageSize == 0)
+      //{
+      //  pageSize = MaxPageSize;
+      //}
 
-      var movies = await m_movieRepository.GetAllAsync(pageSize, offset);
+      //var movies = await m_movieRepository.GetAllAsync(pageSize, offset);
 
-      // If the returned movies count is less than the page size, then it means
-      // there is no more movies to get, so set the next page token to empty
-      var nextPageToken = string.Empty;
-      if (movies.Count() == pageSize)
-      {
-        var nextOffsetPageToken = new OffsetPageToken(pageSize, offset + pageSize);
-        nextPageToken = nextOffsetPageToken.ToToken();
-      }
+      //// If the returned movies count is less than the page size, then it means
+      //// there is no more movies to get, so set the next page token to empty
+      //var nextPageToken = string.Empty;
+      //if (movies.Count() == pageSize)
+      //{
+      //  var nextOffsetPageToken = new OffsetPageToken(pageSize, offset + pageSize);
+      //  nextPageToken = nextOffsetPageToken.ToToken();
+      //}
 
-      var paginationResponse = new PaginationRespone { NextPageToken = nextPageToken };
-      var response = new ListMoviesResponse { PaginationResponse = paginationResponse };
-      var protobufMovies = movies.Select(m => m.ToProtobuf());
-      response.Movies.AddRange(protobufMovies);
+      //var paginationResponse = new PaginationRespone { NextPageToken = nextPageToken };
+      //var response = new ListMoviesResponse { PaginationResponse = paginationResponse };
+      //var protobufMovies = movies.Select(m => ((Domain.Entities.Movie)m).ToProtobuf());
+      //response.Movies.AddRange(protobufMovies);
 
-      return response;
+      //return response;
+      throw new NotImplementedException();
     }
 
     /// <inheritdoc/>
@@ -85,26 +86,18 @@ namespace Dotflik.WebApp.Server.Services
         throw new ArgumentException($"Unable to find movie with id \"{id}\"");
       }
 
-      var response = new MovieAggregate { Movie = movie.ToProtobuf() };
-      response.Stars.AddRange(movie.Stars.Select(s => s.ToProtobuf()));
-      response.Genres.AddRange(movie.Genres.Select(g => g.ToProtobuf()));
-     
-      return response;
+      return movie.ToProtobuf();
     }
 
     /// <inheritdoc/>
-    public override async Task<MovieAggregate> GetMovieByTitle(GetMovieByTitleRequest request, ServerCallContext context)
+    public override async Task<GetMovieByTitleResponse> GetMovieByTitle(GetMovieByTitleRequest request, ServerCallContext context)
     {
       var title = request.Title;
-      var movie = await m_movieRepository.GetByTitleAsync(request.Title);
-      if (movie is null)
-      {
-        throw new ArgumentException($"Unable to find movie with title \"{title}\"");
-      }
-
-      var response = new MovieAggregate { Movie = movie.ToProtobuf() };
-      response.Stars.AddRange(movie.Stars.Select(s => s.ToProtobuf()));
-      response.Genres.AddRange(movie.Genres.Select(g => g.ToProtobuf()));
+      var movies = await m_movieRepository.GetByTitleAsync(request.Title);
+      
+      var response = new GetMovieByTitleResponse();
+      var protobufMovieAggrs = movies.Select(m => m.ToProtobuf());
+      response.Movies.AddRange(protobufMovieAggrs);
 
       return response;
     }

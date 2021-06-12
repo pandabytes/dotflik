@@ -27,7 +27,7 @@ service MovieService {
   rpc GetMovieById(GetMovieByIdRequest) returns (MovieAggregate);
 
   // Get a movie by its title
-  rpc GetMovieByTitle(GetMovieByTitleRequest) returns (MovieAggregate);  
+  rpc GetMovieByTitle(GetMovieByTitleRequest) returns (GetMovieByTitleResponse);  
 }
 
 // This message aggregates all the necessary information
@@ -61,6 +61,11 @@ message GetMovieByIdRequest {
 // The request to get the movie by its title
 message GetMovieByTitleRequest {
   string title = 1; // Title of the movie
+}
+
+// The response to get the movie by its title
+message GetMovieByTitleResponse {
+  repeated MovieAggregate movies = 1; // List of movies that have the same title
 }
 
 // The request to list movies by a year range using pagination
