@@ -27,12 +27,19 @@ namespace Dotflik.WebApp.Server.Interceptors
       @"Offset must be a multiple of limit. Please make sure to use the 
         token from the service response. Otherwise set page token to empty.";
 
+    protected const string PageSizeLessThanZeroMessage = "Page size must be at least 0";
+
     public override async Task<TResponse> UnaryServerHandler<TRequest, TResponse>(TRequest request, ServerCallContext context, UnaryServerMethod<TRequest, TResponse> continuation)
     {
       var paginationRequest = request as PaginationRequest;
       if (paginationRequest != null)
       {
         var (pageSize, pageToken) = (paginationRequest.PageSize, paginationRequest.PageToken);
+
+        if (pageSize < 0)
+        {
+          throw new ArgumentException(PageSizeLessThanZeroMessage);
+        }
 
         if (!string.IsNullOrWhiteSpace(pageToken))
         {

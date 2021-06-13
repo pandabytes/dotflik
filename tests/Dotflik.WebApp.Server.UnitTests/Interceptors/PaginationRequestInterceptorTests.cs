@@ -151,6 +151,28 @@ namespace Dotflik.WebApp.Server.Interceptors.UnitTests
     }
 
     [Theory]
+    [InlineData(-1)]
+    [InlineData(-5)]
+    [InlineData(-10)]
+    [InlineData(-100)]
+    public async Task UnaryServerHandler_NegativePageSize_ThrowsArgumentException(int pageSize)
+    {
+      // Arrange
+      var request = new PaginationRequest
+      {
+        PageToken = string.Empty,
+        PageSize = pageSize
+      };
+
+      // Act
+      var ex = await Assert.ThrowsAsync<ArgumentException>(
+        () => m_pgRequestInterceptor.UnaryServerHandler(request, m_serverContext, m_continuation));
+
+      // Assert
+      Assert.Equal(PageSizeLessThanZeroMessage, ex.Message);
+    }
+
+    [Theory]
     [InlineData(1)]
     [InlineData(5)]
     [InlineData(10)]
