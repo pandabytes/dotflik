@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 
-using Dotflik.Protobuf.Movie;
+using Dotflik.Protobuf;
 
 namespace Dotflik.WebApp.Client
 {
@@ -27,7 +27,7 @@ namespace Dotflik.WebApp.Client
         {
           HttpHandler = new GrpcWebHandler(new HttpClientHandler())
         });
-        
+
         return new MovieService.MovieServiceClient(channel);
       });
 

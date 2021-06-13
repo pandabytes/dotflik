@@ -11,7 +11,7 @@
 }
 else
 {
-  @if (m_movies != null)
+  @if (m_movieAggrs != null)
   {
     <select name="Number of movies" @onchange="PageSizeUpdateHandler">
       <option value="5">5</option>
@@ -21,14 +21,14 @@ else
     </select>
 
     <div class="card-columns">
-      @foreach (var movie in m_movies)
+      @foreach (var movieAggr in m_movieAggrs)
       {
         <div class="card" style="width: 17rem;">
-          <img class="card-img-top" src="@GetBannerUrl(movie)">
+          <img class="card-img-top" src="@GetBannerUrl(movieAggr.Movie)">
 
           <div class="card-body">
-            <h3 class="card-title">@movie.Title</h3>
-            <h5 class="card-subtitle">@movie.Year</h5>
+            <h3 class="card-title">@movieAggr.Movie.Title</h3>
+            <h5 class="card-subtitle">@movieAggr.Movie.Year</h5>
           </div>
 
           <div class="card-footer">
@@ -52,7 +52,7 @@ else
 @code 
 { 
   private bool m_errorOccurred;
-  private List<Movie>? m_movies;
+  private List<MovieAggregate>? m_movieAggrs;
 
   protected async override Task OnInitializedAsync()
   {
@@ -85,8 +85,8 @@ else
       var request = new PaginationRequest { PageSize = pageSize };
       var response = await MovieService.ListMoviesAsync(request);
 
-      m_movies = new List<Movie>();
-      m_movies.AddRange(response.Movies);
+      m_movieAggrs = new List<MovieAggregate>();
+      m_movieAggrs.AddRange(response.Movies);
       m_errorOccurred = false;
     }
     catch (Exception ex)

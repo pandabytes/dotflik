@@ -20,8 +20,20 @@
 
   <!-- Dotflik protobuf files -->
   <ItemGroup>
-    <Protobuf Include="..\protos\dotflik\protobuf\movie\movie_service.proto" GrpcServices="Client" ProtoRoot="..\protos">
-      <Link>protos\dotflik\protobuf\movie\movie_service.proto</Link>
+    <Protobuf Include="..\protos\dotflik\protobuf\movie_service.proto" GrpcServices="Client" ProtoRoot="..\protos">
+      <Link>protos\dotflik\protobuf\movie_service.proto</Link>
+    </Protobuf>
+
+    <Protobuf Include="..\protos\dotflik\protobuf\resources\movie.proto" GrpcServices="None" ProtoRoot="..\protos">
+      <Link>protos\dotflik\protobuf\resources\movie.proto</Link>
+    </Protobuf>
+
+    <Protobuf Include="..\protos\dotflik\protobuf\resources\star.proto" GrpcServices="None" ProtoRoot="..\protos">
+      <Link>protos\dotflik\protobuf\resources\star.proto</Link>
+    </Protobuf>
+
+    <Protobuf Include="..\protos\dotflik\protobuf\resources\genre.proto" GrpcServices="None" ProtoRoot="..\protos">
+      <Link>protos\dotflik\protobuf\resources\genre.proto</Link>
     </Protobuf>
 
     <Protobuf Include="..\protos\dotflik\protobuf\pagination\pagination.proto" GrpcServices="None" ProtoRoot="..\protos">
