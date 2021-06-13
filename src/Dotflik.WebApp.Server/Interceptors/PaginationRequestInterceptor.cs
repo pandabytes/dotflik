@@ -34,24 +34,27 @@ namespace Dotflik.WebApp.Server.Interceptors
       {
         var (pageSize, pageToken) = (paginationRequest.PageSize, paginationRequest.PageToken);
 
-        var offsetPageToken = new OffsetPageToken(pageToken);
-        var (limit, offset) = (offsetPageToken.Limit, offsetPageToken.Offset);
-
-        // Ensure the page size and limit in the token are consistent
-        // If offset is 0, it means we're getting results for 1st page and
-        // limit can be safely ignored since we'll use pageSize instead
-        if (pageSize != limit && offset != 0)
+        if (!string.IsNullOrWhiteSpace(pageToken))
         {
-          throw new ArgumentException(InconsistentPageTokenMessage);
-        }
+          var offsetPageToken = new OffsetPageToken(pageToken);
+          var (limit, offset) = (offsetPageToken.Limit, offsetPageToken.Offset);
 
-        // This check verifies whether the offset in the token is consistent
-        // with the limit. The logic here is the limit should always be divisible
-        // by the offset and if it's false, then the client is not being
-        // consistent with the request
-        if (offset > 0 && offset % limit != 0)
-        {
-          throw new ArgumentException(OffsetNotMultipleOfLimitMessage);
+          // Ensure the page size and limit in the token are consistent
+          // If offset is 0, it means we're getting results for 1st page and
+          // limit can be safely ignored since we'll use pageSize instead
+          if (pageSize != limit)
+          {
+            throw new ArgumentException(InconsistentPageTokenMessage);
+          }
+
+          // This check verifies whether the offset in the token is consistent
+          // with the limit. The logic here is the limit should always be divisible
+          // by the offset and if it's false, then the client is not being
+          // consistent with the request
+          if (offset % limit != 0)
+          {
+            throw new ArgumentException(OffsetNotMultipleOfLimitMessage);
+          }
         }
       }
 

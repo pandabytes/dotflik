@@ -34,7 +34,7 @@ namespace Dotflik.Infrastructure.Repositories
 	            OFFSET @Offset
 	           ) AS m, stars s, genres g, stars_in_movies sm, genres_in_movies gm
         WHERE s.id = sm.starId AND m.id = sm.movieId AND
-	            g.id = gm.genreId AND m.id = gm.movieId;";
+	            g.id = gm.genreId AND m.id = gm.movieId";
 
       try
       {
@@ -125,8 +125,8 @@ namespace Dotflik.Infrastructure.Repositories
     {
       var parameters = new { Attribute = attributeValue };
       var sql = $@"
-        SELECT m.*, s.*
-        FROM movies m, stars s, genres g, stars_in_movies sm, genres_in_movies gm
+        SELECT m.*, s.*, g.*
+        FROM movies m, stars s, genres g, stars_in_movies sm, genres_in_movies gm 
         WHERE s.id = sm.starId AND m.id = sm.movieId AND
               g.id = gm.genreId AND m.id = gm.movieId AND
               m.{attributeName} = @Attribute";
