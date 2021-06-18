@@ -1,8 +1,13 @@
 import sys
 import psycopg2
 import psycopg2.extras
-from imdb import IMDb
+import logging
+from imdb import IMDb, IMDbDataAccessError
 from getpass import getpass
+
+# Disable imdbpy logging
+logger = logging.getLogger('imdbpy');
+logger.disabled = True
 
 def insertBanner(dbName: str, user: str, password: str, 
                  host: str = "localhost", port: int = 5432):
@@ -11,19 +16,28 @@ def insertBanner(dbName: str, user: str, password: str,
     cur.execute("SELECT id FROM movies")
     rows = cur.fetchall()
 
-    ia = IMDb()
+    coverUrlKey = "cover url"
+    fullSizeUrlKey = "full-size cover url"
+    ia = IMDb(reraiseExceptions=True)
+
     for i, r in enumerate(rows):
       movieId = r["id"]
-      
-      # Ignore the first 2 characters because IMDb doesn't use those characters
-      movie = ia.get_movie(movieId[2:])
 
-      if "cover url" in movie:
-        bannerUrl = movie["cover url"]
-        cur.execute(f"UPDATE movies SET bannerUrl = '{bannerUrl}' WHERE id = '{movieId}'")
-        print(f"{i+1} - Updated movie \"{movieId}\" {bannerUrl}")
-      else:
-        print(f"{i+1} - Movie \"{movieId}\" has no banner")
+      print(f"Id: {movieId[2:]} - {movieId}")     
+      try:
+        # Ignore the first 2 characters because IMDb doesn't use those characters
+        movie = ia.get_movie(movieId[2:])
+
+        bannerUrl = "NULL"
+        if fullSizeUrlKey in movie.keys():
+          bannerUrl = f"'{movie[fullSizeUrlKey]}'"
+        elif coverUrlKey in movie.keys():
+          bannerUrl = f"'{movie[coverUrlKey]}'"
+
+        cur.execute(f"UPDATE movies SET bannerUrl = {bannerUrl} WHERE id = '{movieId}'")
+        print(f"  {i+1} - Updated movie \"{movieId}\" {bannerUrl}")
+      except IMDbDataAccessError as ex:
+        print(str(ex))
 
 def insertHeadshot(dbName: str, user: str, password: str, 
                    host: str = "localhost", port: int = 5432):
@@ -32,19 +46,28 @@ def insertHeadshot(dbName: str, user: str, password: str,
     cur.execute("SELECT id FROM stars")
     rows = cur.fetchall()
 
-    ia = IMDb()
+    headshotKey = "headshot"
+    fullSizeKey = "full-size headshot"
+    ia = IMDb(reraiseExceptions=True)
+
     for i, r in enumerate(rows):
       starId = r["id"]
       
-      # Ignore the first 2 characters because IMDb doesn't use those characters
-      star = ia.get_person(starId[2:])
+      print(f"Id: {starId[2:]} - {starId}")
+      try:
+        # Ignore the first 2 characters because IMDb doesn't use those characters
+        star = ia.get_person(starId[2:])
 
-      if "headshot" in star:
-        headshotUrl = star["headshot"]
-        cur.execute(f"UPDATE stars SET headshot = '{headshotUrl}' WHERE id = '{starId}'")
+        headshotUrl = "NULL"
+        if fullSizeKey in star.keys():
+          headshotUrl = f"'{star[fullSizeKey]}'"
+        elif headshotKey in star.keys():
+          headshotUrl = f"'{star[headshotKey]}'"
+
+        cur.execute(f"UPDATE stars SET headshot = {headshotUrl} WHERE id = '{starId}'")
         print(f"{i+1} - Updated star \"{starId}\" {headshotUrl}")
-      else:
-        print(f"{i+1} - Star \"{starId}\" has no headshot")
+      except IMDbDataAccessError as ex:
+        print(str(ex))
 
 if __name__ == "__main__":
   args = sys.argv[1:]
