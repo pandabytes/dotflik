@@ -29,6 +29,11 @@ else
             <h3 class="card-title">@movieAggr.Movie.Title</h3>
             <h5 class="card-subtitle">@movieAggr.Movie.Year</h5>
           </div>
+          
+          @foreach (var genre in movieAggr.Genres)
+          {
+            <a href="#" class="badge badge-pill badge-primary" style="margin: 5px 5px;">@genre.Name</a>
+          }
 
           <div class="card-footer">
             <small class="text-muted">
@@ -69,7 +74,11 @@ else
           <div class="card">
             <img class="card-img-top" src="@GetBannerUrl(m_selectMovieAggr.Movie)">
             <div class="card-body">
-              <p class="card-text">Movie detail here</p>
+              <h3 class="card-title">Genres</h3>
+              @foreach (var genre in m_selectMovieAggr.Genres)
+              {
+                <a href="#" class="badge badge-pill badge-primary" style="margin: 0px 5px;">@genre.Name</a>
+              }
             </div>
           </div>
         </div>
