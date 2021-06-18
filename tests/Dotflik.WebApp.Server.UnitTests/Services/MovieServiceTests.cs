@@ -9,7 +9,6 @@ using Google.Protobuf.WellKnownTypes;
 
 using Dotflik.Protobuf;
 using Dotflik.Protobuf.Pagination;
-using Dotflik.Protobuf.Resources;
 using Dotflik.Application.Repositories;
 using Dotflik.WebApp.Server.Mappings;
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
@@ -32,8 +33,8 @@ namespace Dotflik.Infrastructure.Repositories
 
         // Use Query instead of QuerySingle to avoid InvalidOperationException
         // if the id is not found
-        var genres = connection.Query<Genre>(sql, parameters).AsList();
-        return genres?.Count == 1 ? genres[0] : null;
+        var genres = await connection.QueryAsync<Genre>(sql, parameters);
+        return genres.FirstOrDefault();
       }
       catch (Exception ex) when
         (ex is PostgresException || ex is NpgsqlException)
@@ -42,6 +43,7 @@ namespace Dotflik.Infrastructure.Repositories
       }
     }
 
+    /// <inheritdoc/>
     async Task<Genre?> IGenreRepository.GetByNameAsync(string name)
     {
       var parameters = new { Name = name };
@@ -54,13 +56,32 @@ namespace Dotflik.Infrastructure.Repositories
 
         // Use Query instead of QuerySingle to avoid InvalidOperationException
         // if the id is not found
-        var genres = connection.Query<Genre>(sql, parameters).AsList();
-        return genres?.Count == 1 ? genres[0] : null;
+        var genres = await connection.QueryAsync<Genre>(sql, parameters);
+        return genres.FirstOrDefault();
       }
       catch (Exception ex) when
         (ex is PostgresException || ex is NpgsqlException)
       {
         throw new RepositoryException($"Fail to get genre with name \"{name}\"", ex);
+      }
+    }
+
+    /// <inheritdoc/>
+    async Task<IEnumerable<string>> IGenreRepository.GetGenreNamesAsync()
+    {
+      const string sql = "SELECT name FROM genres";
+      try
+      {
+        await using var connection = new NpgsqlConnection(m_dbSettings.ConnectionString);
+        await connection.OpenAsync();
+
+        var genres = await connection.QueryAsync<Genre>(sql);
+        return genres.Select(g => g.Name);
+      }
+      catch (Exception ex) when
+        (ex is PostgresException || ex is NpgsqlException)
+      {
+        throw new RepositoryException("Fail to get only genre names", ex);
       }
     }
 

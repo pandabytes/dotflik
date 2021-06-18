@@ -23,5 +23,11 @@ namespace Dotflik.Application.Repositories
     /// <param name="name">Name of the genre</param>
     /// <returns>Genre object or null if not found</returns>
     Task<Genre?> GetByNameAsync(string name);
+
+    /// <summary>
+    /// Get only the genre names
+    /// </summary>
+    /// <returns>Genre names</returns>
+    Task<IEnumerable<string>> GetGenreNamesAsync();
   }
 }

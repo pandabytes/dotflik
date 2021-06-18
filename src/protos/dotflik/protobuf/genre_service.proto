@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package dotflik.protobuf;
+
+import "dotflik/protobuf/resources/genre.proto";
+import "dotflik/protobuf/resources/movie.proto";
+import "dotflik/protobuf/resources/star.proto";
+
+import "google/protobuf/empty.proto";
+
+// Service for handling querying genres and the associated movies to each genre
+service GenreService {
+  // Get only the genre names
+  rpc GetGenreNamesOnly (google.protobuf.Empty) returns (GetGenreNamesOnlyResponse);
+}
+
+// The response of getting only genre names
+message GetGenreNamesOnlyResponse {
+  // Genre names
+  repeated string genre_names = 1;
+}

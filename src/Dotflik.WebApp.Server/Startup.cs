@@ -74,6 +74,10 @@ namespace Dotflik.WebApp.Server
                  .EnableGrpcWeb()
                  .RequireCors(AllowAllCorsPolicy);
 
+        endpoints.MapGrpcService<GenreService>()
+                 .EnableGrpcWeb()
+                 .RequireCors(AllowAllCorsPolicy);
+
         endpoints.MapGet("/", async context =>
         {
             await context.Response.WriteAsync("Only gRPC is supported");
