@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Dotflik.Application.Repositories;
 using Dotflik.Application.Repositories.Settings;
+using Dotflik.Application.Validation;
 
 using Xunit;
 using Moq;
@@ -67,6 +68,22 @@ namespace Dotflik.Infrastructure.UnitTests
       var services = new ServiceCollection();
 
       Assert.Throws<NotSupportedException>(() => services.AddGenreRepository(notSupportedDb));
+    }
+
+    [Fact]
+    public void AddDataAnnotationValidator_SimpleCall_DataAnnationationValidatorIsAdded()
+    {
+      // Arrange
+      var services = new ServiceCollection();
+
+      // Act
+      services.AddDataAnnotationValidator();
+      var provider = services.BuildServiceProvider();
+
+      // Assert
+      // No need to call any Xunit.Assert because GetRequiredService
+      // would throw an exception if the service is not registered
+      _ = provider.GetRequiredService<IDataAnnotationValidator>();
     }
 
   }
