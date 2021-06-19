@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Configuration;
 using Dotflik.Application.Repositories.Settings;
 
-namespace Dotflik.WebApp.Server.Models
+namespace Dotflik.WebApp.Server.Settings
 {
   /// <summary>
   /// Containing database settings for PostgresSQL

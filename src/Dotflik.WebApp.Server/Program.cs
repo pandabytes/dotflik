@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 
+using Dotflik.Application.Repositories.Settings;
+using Dotflik.WebApp.Server.Extensions;
+
 namespace Dotflik.WebApp.Server
 {
   public class Program
@@ -9,6 +12,7 @@ namespace Dotflik.WebApp.Server
     {
       CreateHostBuilder(args)
         .Build()
+        .ValidateDataAnnotations<DatabaseSettings>()
         .Run();
     }
 

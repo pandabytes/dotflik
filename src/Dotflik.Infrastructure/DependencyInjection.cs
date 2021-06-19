@@ -5,7 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Dotflik.Domain.Entities;
 using Dotflik.Application.Repositories.Settings;
 using Dotflik.Application.Repositories;
+using Dotflik.Application.Validation;
 using Dotflik.Infrastructure.Repositories;
+using Dotflik.Infrastructure.Validation;
 
 namespace Dotflik.Infrastructure
 {
@@ -63,6 +65,18 @@ namespace Dotflik.Infrastructure
 
       return services;
     }
+
+    /// <summary>
+    /// Add <see cref="IDataAnnotationValidator"/> as a transient service
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns>Services</returns>
+    public static IServiceCollection AddDataAnnotationValidator(this IServiceCollection services)
+    {
+      services.AddTransient<IDataAnnotationValidator, DataAnnotationValidator>();
+      return services;
+    }
+
 
   }
 }

@@ -12,10 +12,12 @@ using Microsoft.Extensions.Configuration;
 
 using Dotflik.Application.Repositories;
 using Dotflik.Application.Repositories.Settings;
+using Dotflik.Application.Validation;
+using Dotflik.Domain.Exceptions;
 using Dotflik.Infrastructure;
 using Dotflik.WebApp.Server.Interceptors;
 using Dotflik.WebApp.Server.Services;
-using Dotflik.WebApp.Server.Models;
+using Dotflik.WebApp.Server.Settings;
 
 namespace Dotflik.WebApp.Server
 {
@@ -49,11 +51,17 @@ namespace Dotflik.WebApp.Server
                .WithExposedHeaders("Grpc-Status", "Grpc-Message", "Grpc-Encoding", "Grpc-Accept-Encoding");
       }));
 
-      var dbSettings = ValidateDataAnnotations<PostgresDbSettings>(Configuration, PostgresDbSettings.SectionKey);
+      var dbSettings = Configuration.GetSection(PostgresDbSettings.SectionKey)
+                                    .Get<PostgresDbSettings>();
+      if (dbSettings is null)
+      {
+        throw new MissingSettingsException($"Settings \"{PostgresDbSettings.SectionKey}\" is not provided in the configuration");
+      }
       services.AddSingleton<DatabaseSettings>(dbSettings);
 
       services.AddMovieRepository(Database.PostgresSQL)
-              .AddGenreRepository(Database.PostgresSQL);
+              .AddGenreRepository(Database.PostgresSQL)
+              .AddDataAnnotationValidator();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
