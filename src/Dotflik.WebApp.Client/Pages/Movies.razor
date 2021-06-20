@@ -4,7 +4,7 @@
 @inject MovieService.MovieServiceClient MovieService
 @inject GenreService.GenreServiceClient GenreService
 
-<h3>Movie</h3>
+<h3>Movies</h3>
 
 @if (m_errorOccurred)
 {
@@ -12,7 +12,7 @@
 }
 else
 {
-  @if (m_movieAggrs != null)
+  @if (m_movies != null)
   {
     <select name="Number of movies" @onchange="PageSizeUpdateHandler">
       <option value="5">5</option>
@@ -22,24 +22,24 @@ else
     </select>
 
     <div class="card-columns">
-      @foreach (var movieAggr in m_movieAggrs)
+      @foreach (var movie in m_movies)
       {
       <div class="card" style="width: 17rem;">
-        <img class="card-img-top" src="@GetBannerUrl(movieAggr.Movie)">
+        <img class="card-img-top" src="@GetBannerUrl(movie)">
 
         <div class="card-body">
-          <h3 class="card-title">@movieAggr.Movie.Title</h3>
-          <h5 class="card-subtitle">@movieAggr.Movie.Year</h5>
+          <h3 class="card-title">@movie.Title</h3>
+          <h5 class="card-subtitle">@movie.Year</h5>
         </div>
 
-        @foreach (var genre in movieAggr.Genres)
+        @foreach (var genre in movie.Genres)
         {
           <a href="#" class="badge badge-pill badge-primary" style="margin: 5px 5px;">@genre.Name</a>
         }
 
         <div class="card-footer">
           <small class="text-muted">
-            <button class="btn btn-primary" @onclick="e => SelectMovie(movieAggr)"
+            <button class="btn btn-primary" @onclick="e => SelectMovie(movie)"
                     data-toggle="modal" data-target="#@MovieModalId">
               More Info
             </button>
@@ -56,27 +56,26 @@ else
   }
 }
 
-<MovieDetails Movie="@m_selectMovieAggr?.ToDomainAggregate()" MovieModalId="@MovieModalId" />
+<MovieDetails Movie="@m_selectMovie" MovieModalId="@MovieModalId" />
 
 @code
 {
   private const string MovieModalId = "movieModal";
 
   private bool m_errorOccurred;
-  private List<MovieAggregate>? m_movieAggrs;
-  private MovieAggregate? m_selectMovieAggr;
+  private List<Domain.Aggregates.Movie>? m_movies;
+  private Domain.Aggregates.Movie? m_selectMovie;
 
   protected async override Task OnInitializedAsync()
   {
-    m_movieAggrs = new List<MovieAggregate>();
-
-    var response = await GetMovies(5);
-    if (response is not null)
+    var tuple = await GetMovies(5);
+    if (tuple is not null)
     {
-      m_movieAggrs.AddRange(response.Movies);
+      var (movies, _) = tuple.Value;
+      m_movies = movies;
     }
-    
-    m_errorOccurred = response is null;
+
+    m_errorOccurred = tuple is null;
   }
 
   /// <summary>
@@ -86,7 +85,7 @@ else
   /// </summary>
   /// <param name="movie">Movie object</param>
   /// <returns>Url to banner</returns>
-  private static string GetBannerUrl(Movie movie)
+  private static string GetBannerUrl(Domain.Aggregates.Movie movie)
   {
     const string unavailableBannerUrl = "http://www.interlog.com/~tfs/images/posters/TFSMoviePosterUnavailable.jpg";
     return string.IsNullOrWhiteSpace(movie.BannerUrl) ? unavailableBannerUrl : movie.BannerUrl;
@@ -94,20 +93,27 @@ else
 
   private async Task PageSizeUpdateHandler(ChangeEventArgs events)
   {
+    m_movies = null;
+
     int.TryParse(events.Value?.ToString(), out int pageSize);
-    var response = await GetMovies(pageSize);
-    if (response is not null)
+    var tuple = await GetMovies(pageSize);
+
+    if (tuple is not null)
     {
-      m_movieAggrs = new List<MovieAggregate>(response.Movies);
+      var (movies, _) = tuple.Value;
+      m_movies = movies;
     }
   }
 
-  private async Task<ListMoviesResponse?> GetMovies(int pageSize, string token = "")
+  private async Task<(List<Domain.Aggregates.Movie>, string)?> GetMovies(int pageSize, string token = "")
   {
     try
     {
       var request = new PaginationRequest { PageSize = pageSize, PageToken = token };
-      return await MovieService.ListMoviesAsync(request);
+      var response = await MovieService.ListMoviesAsync(request);
+
+      var movies = response.Movies.Select(m => m.ToDomainAggregate()).ToList();
+      return (movies, response.PaginationResponse.NextPageToken);
     }
     catch (RpcException ex)
     {
@@ -116,9 +122,9 @@ else
     return null;
   }
 
-  private void SelectMovie(MovieAggregate movieAggr)
+  private void SelectMovie(Domain.Aggregates.Movie movieAggr)
   {
-    m_selectMovieAggr = movieAggr;
+    m_selectMovie = movieAggr;
   }
 
 }
