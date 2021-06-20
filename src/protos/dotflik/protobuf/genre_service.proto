@@ -2,10 +2,6 @@ syntax = "proto3";
 
 package dotflik.protobuf;
 
-import "dotflik/protobuf/resources/genre.proto";
-import "dotflik/protobuf/resources/movie.proto";
-import "dotflik/protobuf/resources/star.proto";
-
 import "google/protobuf/empty.proto";
 
 // Service for handling querying genres and the associated movies to each genre

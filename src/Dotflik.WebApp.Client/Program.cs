@@ -4,16 +4,24 @@ using System.Threading.Tasks;
 
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 
 using Dotflik.Protobuf;
+using Dotflik.Infrastructure;
+using Dotflik.Application.Validation;
+using Dotflik.WebApp.Client.Settings;
 
 namespace Dotflik.WebApp.Client
 {
   public class Program
   {
+    /// <summary>
+    /// Main entry point
+    /// </summary>
+    /// <param name="args"></param>
     public static async Task Main(string[] args)
     {
       var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -21,17 +29,42 @@ namespace Dotflik.WebApp.Client
 
       builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
+      builder.Services.AddDataAnnotationValidator();
+
       builder.Services.AddSingleton(sp =>
       {
-        var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions
+        var config = sp.GetRequiredService<IConfiguration>();
+        var grpcSettings = config.GetSection(GrpcSettings.SectionKey).Get<GrpcSettings>();
+
+        var validator = sp.GetRequiredService<IDataAnnotationValidator>();
+        validator.ValidateRecursively(grpcSettings);
+
+        return grpcSettings;
+      });
+
+      // Add grpc clients
+      builder.Services.AddSingleton(sp =>
+      {
+        var movieServiceSettings = sp.GetRequiredService<GrpcSettings>().MovieServiceSettings;
+        var channel = GrpcChannel.ForAddress(movieServiceSettings.Address, new GrpcChannelOptions
         {
           HttpHandler = new GrpcWebHandler(new HttpClientHandler())
         });
-
         return new MovieService.MovieServiceClient(channel);
+      });
+
+      builder.Services.AddSingleton(sp =>
+      {
+        var genreServiceSettings = sp.GetRequiredService<GrpcSettings>().GenreServiceSettings;
+        var channel = GrpcChannel.ForAddress(genreServiceSettings.Address, new GrpcChannelOptions
+        {
+          HttpHandler = new GrpcWebHandler(new HttpClientHandler())
+        });
+        return new GenreService.GenreServiceClient(channel);
       });
 
       await builder.Build().RunAsync();
     }
   }
+
 }

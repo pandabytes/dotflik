@@ -1,8 +1,10 @@
 ﻿@page "/movies"
 @using System.Collections.Generic;
+@using Grpc.Core;
 @inject MovieService.MovieServiceClient MovieService
+@inject GenreService.GenreServiceClient GenreService
 
-<h3>Main Page</h3>
+<h3>Movie</h3>
 
 @if (m_errorOccurred)
 {
@@ -22,29 +24,29 @@ else
     <div class="card-columns">
       @foreach (var movieAggr in m_movieAggrs)
       {
-        <div class="card" style="width: 17rem;">
-          <img class="card-img-top" src="@GetBannerUrl(movieAggr.Movie)">
+      <div class="card" style="width: 17rem;">
+        <img class="card-img-top" src="@GetBannerUrl(movieAggr.Movie)">
 
-          <div class="card-body">
-            <h3 class="card-title">@movieAggr.Movie.Title</h3>
-            <h5 class="card-subtitle">@movieAggr.Movie.Year</h5>
-          </div>
-          
-          @foreach (var genre in movieAggr.Genres)
-          {
-            <a href="#" class="badge badge-pill badge-primary" style="margin: 5px 5px;">@genre.Name</a>
-          }
-
-          <div class="card-footer">
-            <small class="text-muted">
-              <button class="btn btn-primary" @onclick="e => SelectMovie(movieAggr)"
-                      data-toggle="modal" data-target="#@MovieModalId">
-                More Info
-              </button>
-            </small>
-          </div>
-
+        <div class="card-body">
+          <h3 class="card-title">@movieAggr.Movie.Title</h3>
+          <h5 class="card-subtitle">@movieAggr.Movie.Year</h5>
         </div>
+
+        @foreach (var genre in movieAggr.Genres)
+        {
+          <a href="#" class="badge badge-pill badge-primary" style="margin: 5px 5px;">@genre.Name</a>
+        }
+
+        <div class="card-footer">
+          <small class="text-muted">
+            <button class="btn btn-primary" @onclick="e => SelectMovie(movieAggr)"
+                    data-toggle="modal" data-target="#@MovieModalId">
+              More Info
+            </button>
+          </small>
+        </div>
+
+      </div>
       }
     </div>
   }
@@ -54,44 +56,11 @@ else
   }
 }
 
-@* Display a modal popup with more detail information about the selected movie *@
-<div class="modal fade" id="@MovieModalId" 
-     tabindex="-1" role="dialog" 
-     aria-labelledby="@MovieTitleId" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    @if (m_selectMovieAggr is not null)
-    {
-      <div class="modal-content">
-
-        <div class="modal-header">
-          <h5 class="modal-title" id="@MovieTitleId">@m_selectMovieAggr.Movie.Title (@m_selectMovieAggr.Movie.Year)</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <div class="card">
-            <img class="card-img-top" src="@GetBannerUrl(m_selectMovieAggr.Movie)">
-            <div class="card-body">
-              <h3 class="card-title">Genres</h3>
-              @foreach (var genre in m_selectMovieAggr.Genres)
-              {
-                <a href="#" class="badge badge-pill badge-primary" style="margin: 0px 5px;">@genre.Name</a>
-              }
-            </div>
-          </div>
-        </div>
-
-      </div>
-    }
-  </div>
-</div>
+<MovieDetails Movie="@m_selectMovieAggr?.ToDomainAggregate()" MovieModalId="@MovieModalId" />
 
 @code
 {
   private const string MovieModalId = "movieModal";
-  private const string MovieTitleId = "movieTitle";
 
   private bool m_errorOccurred;
   private List<MovieAggregate>? m_movieAggrs;
@@ -99,7 +68,15 @@ else
 
   protected async override Task OnInitializedAsync()
   {
-    await GetMovies(5);
+    m_movieAggrs = new List<MovieAggregate>();
+
+    var response = await GetMovies(5);
+    if (response is not null)
+    {
+      m_movieAggrs.AddRange(response.Movies);
+    }
+    
+    m_errorOccurred = response is null;
   }
 
   /// <summary>
@@ -115,44 +92,33 @@ else
     return string.IsNullOrWhiteSpace(movie.BannerUrl) ? unavailableBannerUrl : movie.BannerUrl;
   }
 
-  /// <summary>
-  /// Get the headshot url from <paramref name="star"/>.
-  /// If the url is empty, then use an unavailable
-  /// headshot url as the fallback url.
-  /// </summary>
-  /// <param name="movie">Star object</param>
-  /// <returns>Url to headshot</returns>
-  private static string GetHeadshotUrl(Star star)
-  {
-    const string unavailableHeadshotUrl = "http://getdrawings.com/img/unknown-person-silhouette-31.png";
-    return string.IsNullOrWhiteSpace(star.Headshot) ? unavailableHeadshotUrl : star.Headshot;
-  }
-
   private async Task PageSizeUpdateHandler(ChangeEventArgs events)
   {
     int.TryParse(events.Value?.ToString(), out int pageSize);
-    await GetMovies(pageSize);
+    var response = await GetMovies(pageSize);
+    if (response is not null)
+    {
+      m_movieAggrs = new List<MovieAggregate>(response.Movies);
+    }
   }
 
-  private async Task GetMovies(int pageSize, string token = "")
+  private async Task<ListMoviesResponse?> GetMovies(int pageSize, string token = "")
   {
     try
     {
       var request = new PaginationRequest { PageSize = pageSize, PageToken = token };
-      var response = await MovieService.ListMoviesAsync(request);
-
-      m_movieAggrs = new List<MovieAggregate>(response.Movies);
-      m_errorOccurred = false;
+      return await MovieService.ListMoviesAsync(request);
     }
-    catch (Exception ex)
+    catch (RpcException ex)
     {
-      Console.WriteLine(ex.Message);
-      m_errorOccurred = true;
+      Console.Error.WriteLine(ex.Message);
     }
+    return null;
   }
 
   private void SelectMovie(MovieAggregate movieAggr)
   {
     m_selectMovieAggr = movieAggr;
   }
+
 }

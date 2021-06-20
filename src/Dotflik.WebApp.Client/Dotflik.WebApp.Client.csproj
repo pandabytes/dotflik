@@ -24,6 +24,10 @@
       <Link>protos\dotflik\protobuf\movie_service.proto</Link>
     </Protobuf>
 
+    <Protobuf Include="..\protos\dotflik\protobuf\genre_service.proto" GrpcServices="Client" ProtoRoot="..\protos">
+      <Link>protos\dotflik\protobuf\genre_service.proto</Link>
+    </Protobuf>
+
     <Protobuf Include="..\protos\dotflik\protobuf\resources\movie.proto" GrpcServices="None" ProtoRoot="..\protos">
       <Link>protos\dotflik\protobuf\resources\movie.proto</Link>
     </Protobuf>
@@ -46,6 +50,10 @@
     <None Include="$(PkgGrpc_Tools)\build\native\include\google\**\*">
       <Link>protos\google\%(RecursiveDir)/%(FileName)%(Extension)</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Dotflik.Application\Dotflik.Application.csproj" />
+    <ProjectReference Include="..\Dotflik.Infrastructure\Dotflik.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
