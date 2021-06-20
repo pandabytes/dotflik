@@ -1,8 +1,4 @@
 ﻿@page "/movies"
-@using System.Collections.Generic;
-@using Grpc.Core;
-@inject MovieService.MovieServiceClient MovieService
-@inject GenreService.GenreServiceClient GenreService
 
 <h3>Movies</h3>
 
@@ -24,31 +20,33 @@ else
     <div class="card-columns">
       @foreach (var movie in m_movies)
       {
-      <div class="card" style="width: 17rem;">
-        <img class="card-img-top" src="@GetBannerUrl(movie)">
+        <div class="card" style="width: 17rem;">
+          <img class="card-img-top" src="@movie.BannerUrl">
 
-        <div class="card-body">
-          <h3 class="card-title">@movie.Title</h3>
-          <h5 class="card-subtitle">@movie.Year</h5>
+          <div class="card-body">
+            <h3 class="card-title">@movie.Title</h3>
+            <h5 class="card-subtitle">@movie.Year</h5>
+          </div>
+
+          @foreach (var genre in movie.Genres)
+          {
+            <a href="#" class="badge badge-pill badge-primary" style="margin: 5px 5px;">@genre.Name</a>
+          }
+
+          <div class="card-footer">
+            <small class="text-muted">
+              <button class="btn btn-primary" @onclick="e => SelectMovie(movie)"
+                      data-toggle="modal" data-target="#@MovieModalId">
+                More Info
+              </button>
+            </small>
+          </div>
+
         </div>
-
-        @foreach (var genre in movie.Genres)
-        {
-          <a href="#" class="badge badge-pill badge-primary" style="margin: 5px 5px;">@genre.Name</a>
-        }
-
-        <div class="card-footer">
-          <small class="text-muted">
-            <button class="btn btn-primary" @onclick="e => SelectMovie(movie)"
-                    data-toggle="modal" data-target="#@MovieModalId">
-              More Info
-            </button>
-          </small>
-        </div>
-
-      </div>
       }
     </div>
+
+    <MovieDetails Movie="@m_selectMovie" MovieModalId="@MovieModalId" />
   }
   else
   {
@@ -56,75 +54,4 @@ else
   }
 }
 
-<MovieDetails Movie="@m_selectMovie" MovieModalId="@MovieModalId" />
 
-@code
-{
-  private const string MovieModalId = "movieModal";
-
-  private bool m_errorOccurred;
-  private List<Domain.Aggregates.Movie>? m_movies;
-  private Domain.Aggregates.Movie? m_selectMovie;
-
-  protected async override Task OnInitializedAsync()
-  {
-    var tuple = await GetMovies(5);
-    if (tuple is not null)
-    {
-      var (movies, _) = tuple.Value;
-      m_movies = movies;
-    }
-
-    m_errorOccurred = tuple is null;
-  }
-
-  /// <summary>
-  /// Get the banner url from <paramref name="movie"/>.
-  /// If the banner url is empty, then use an unavailable
-  /// banner url as the fallback url.
-  /// </summary>
-  /// <param name="movie">Movie object</param>
-  /// <returns>Url to banner</returns>
-  private static string GetBannerUrl(Domain.Aggregates.Movie movie)
-  {
-    const string unavailableBannerUrl = "http://www.interlog.com/~tfs/images/posters/TFSMoviePosterUnavailable.jpg";
-    return string.IsNullOrWhiteSpace(movie.BannerUrl) ? unavailableBannerUrl : movie.BannerUrl;
-  }
-
-  private async Task PageSizeUpdateHandler(ChangeEventArgs events)
-  {
-    m_movies = null;
-
-    int.TryParse(events.Value?.ToString(), out int pageSize);
-    var tuple = await GetMovies(pageSize);
-
-    if (tuple is not null)
-    {
-      var (movies, _) = tuple.Value;
-      m_movies = movies;
-    }
-  }
-
-  private async Task<(List<Domain.Aggregates.Movie>, string)?> GetMovies(int pageSize, string token = "")
-  {
-    try
-    {
-      var request = new PaginationRequest { PageSize = pageSize, PageToken = token };
-      var response = await MovieService.ListMoviesAsync(request);
-
-      var movies = response.Movies.Select(m => m.ToDomainAggregate()).ToList();
-      return (movies, response.PaginationResponse.NextPageToken);
-    }
-    catch (RpcException ex)
-    {
-      Console.Error.WriteLine(ex.Message);
-    }
-    return null;
-  }
-
-  private void SelectMovie(Domain.Aggregates.Movie movieAggr)
-  {
-    m_selectMovie = movieAggr;
-  }
-
-}

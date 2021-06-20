@@ -42,6 +42,11 @@ namespace Dotflik.WebApp.Client
         return grpcSettings;
       });
 
+      // Initial call to validate the settings right at start up
+      _ = builder.Build()
+                 .Services
+                 .GetRequiredService<GrpcSettings>();
+
       // Add grpc clients
       builder.Services.AddSingleton(sp =>
       {
@@ -66,5 +71,7 @@ namespace Dotflik.WebApp.Client
       await builder.Build().RunAsync();
     }
   }
+
+  
 
 }
