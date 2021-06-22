@@ -9,7 +9,7 @@
       <div class="modal-content">
 
         <div class="modal-header">
-          <h5 class="modal-title" id="@MovieTitleId">@Movie.Title (@Movie.Year)</h5>
+          <h2 class="modal-title" id="@MovieTitleId">@Movie.Title (@Movie.Year)</h2>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -19,6 +19,9 @@
           <div class="card">
             <img class="card-img-top" src="@Movie.BannerUrl">
             <div class="card-body">
+              <h4 class="card-title">Directed by</h4>
+              <a href="#" class="badge badge-pill" style="margin: 5px 5px;">@Movie.Director</a>
+
               <h3 class="card-title">Genres</h3>
               @foreach (var genre in Movie.Genres)
               {
