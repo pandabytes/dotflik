@@ -2,28 +2,53 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-
+using Fluxor;
+using Fluxor.Blazor.Web.Components;
 using Grpc.Core;
 using Dotflik.Protobuf;
 using Dotflik.Protobuf.Pagination;
 using Dotflik.WebApp.Client.Mappings;
+using Dotflik.WebApp.Client.Stores;
+using Dotflik.WebApp.Client.Stores.Movies;
+using Microsoft.AspNetCore.Components;
 
 namespace Dotflik.WebApp.Client.Pages
 {
-  public partial class Movies : ComponentBase
+  public partial class Movies : FluxorComponent
   {
     private const string MovieModalId = "movieModal";
-
-    private bool m_errorOccurred;
-    private List<Domain.Aggregates.Movie>? m_movies;
-    private Domain.Aggregates.Movie? m_selectMovie;
 
     [Inject]
     protected MovieService.MovieServiceClient MovieService { get; set; } = null!;
 
     [Inject]
     protected GenreService.GenreServiceClient GenreService { get; set; } = null!;
+
+    [Inject]
+    protected IDispatcher Dispatcher { get; set; } = null!;
+
+    [Inject]
+    protected IState<DotflikState> DotflikState { get; set; } = null!;
+
+    /// <summary>
+    /// Indicate an error has occured on this page
+    /// </summary>
+    private bool m_errorOccurred;
+
+    /// <summary>
+    /// The currently selected movie
+    /// </summary>
+    private Domain.Aggregates.Movie? m_selectMovie;
+
+    /// <summary>
+    /// Reference to the movie state from the <see cref="DotflikState"/>. 
+    /// This propertyonly serves as a shorter way 
+    /// to reference <see cref="DotflikState.MovieState"/>
+    /// </summary>
+    protected virtual MoviesState MoviesState
+    {
+      get => DotflikState.Value.MovieState;
+    }
 
     /// <inheritdoc/>
     protected async override Task OnInitializedAsync()
@@ -32,29 +57,19 @@ namespace Dotflik.WebApp.Client.Pages
       if (tuple is not null)
       {
         var (movies, _) = tuple.Value;
-        m_movies = movies;
+        Dispatcher.Dispatch(new MoviesAddMoviesAction(movies));
       }
 
       m_errorOccurred = tuple is null;
     }
 
-    private async Task PageSizeUpdateHandler(ChangeEventArgs events)
-    {
-      m_movies = null;
-
-      var isNumber = int.TryParse(events.Value?.ToString(), out int pageSize);
-      if (isNumber)
-      {
-        var tuple = await GetMovies(pageSize);
-
-        if (tuple is not null)
-        {
-          var (movies, _) = tuple.Value;
-          m_movies = movies;
-        }
-      }
-    }
-
+    /// <summary>
+    /// Get the movies via gRPC movie service
+    /// </summary>
+    /// <param name="pageSize"></param>
+    /// <param name="token"></param>
+    /// <returns>Tuple where 1st item is the list of movies and
+    /// 2nd item is the next token</returns>
     private async Task<(List<Domain.Aggregates.Movie>, string)?> GetMovies(int pageSize, string token = "")
     {
       try
@@ -72,10 +87,12 @@ namespace Dotflik.WebApp.Client.Pages
       return null;
     }
 
-    private void SelectMovie(Domain.Aggregates.Movie movieAggr)
-    {
-      m_selectMovie = movieAggr;
-    }
+    /// <summary>
+    /// Save the selected movie
+    /// </summary>
+    /// <param name="movie">Selected movie</param>
+    private void SelectMovie(Domain.Aggregates.Movie movie)
+      => m_selectMovie = movie;
 
   }
 }

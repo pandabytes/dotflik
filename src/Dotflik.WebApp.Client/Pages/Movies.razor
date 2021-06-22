@@ -1,24 +1,18 @@
 ﻿@page "/movies"
+@inherits FluxorComponent
 
 <h3>Movies</h3>
 
 @if (m_errorOccurred)
 {
-  <Error></Error>
+  <Error ErrorMessage="Unable to fetch movies. Please try again." />
 }
 else
 {
-  @if (m_movies != null)
+  @if (MoviesState.Movies.Count > 0)
   {
-    <select name="Number of movies" @onchange="PageSizeUpdateHandler">
-      <option value="5">5</option>
-      <option value="10">10</option>
-      <option value="20">20</option>
-      <option value="50">50</option>
-    </select>
-
     <div class="card-columns">
-      @foreach (var movie in m_movies)
+      @foreach (var movie in MoviesState.Movies)
       {
         <div class="card" style="width: 17rem;">
           <img class="card-img-top" src="@movie.BannerUrl">

@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 
+using Fluxor;
+
 using Grpc.Net.Client;
 using Grpc.Net.Client.Web;
 
@@ -30,6 +32,8 @@ namespace Dotflik.WebApp.Client
       builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
       builder.Services.AddDataAnnotationValidator();
+
+      builder.Services.AddFluxor(o => o.ScanAssemblies(typeof(Program).Assembly));
 
       builder.Services.AddSingleton(sp =>
       {
