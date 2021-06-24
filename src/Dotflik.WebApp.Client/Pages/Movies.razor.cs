@@ -8,8 +8,8 @@ using Grpc.Core;
 using Dotflik.Protobuf;
 using Dotflik.Protobuf.Pagination;
 using Dotflik.WebApp.Client.Mappings;
-using Dotflik.WebApp.Client.Stores;
-using Dotflik.WebApp.Client.Stores.Movies;
+using Dotflik.WebApp.Client.Store;
+using Dotflik.WebApp.Client.Store.Movies;
 using Microsoft.AspNetCore.Components;
 
 namespace Dotflik.WebApp.Client.Pages
@@ -28,7 +28,7 @@ namespace Dotflik.WebApp.Client.Pages
     protected IDispatcher Dispatcher { get; set; } = null!;
 
     [Inject]
-    protected IState<DotflikState> DotflikState { get; set; } = null!;
+    protected IState<MoviesState> MoviesState { get; set; } = null!;
 
     /// <summary>
     /// Indicate an error has occured on this page
@@ -39,16 +39,6 @@ namespace Dotflik.WebApp.Client.Pages
     /// The currently selected movie
     /// </summary>
     private Domain.Aggregates.Movie? m_selectMovie;
-
-    /// <summary>
-    /// Reference to the movie state from the <see cref="DotflikState"/>. 
-    /// This propertyonly serves as a shorter way 
-    /// to reference <see cref="DotflikState.MovieState"/>
-    /// </summary>
-    protected virtual MoviesState MoviesState
-    {
-      get => DotflikState.Value.MovieState;
-    }
 
     /// <inheritdoc/>
     protected async override Task OnInitializedAsync()

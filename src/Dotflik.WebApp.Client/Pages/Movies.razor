@@ -9,10 +9,10 @@
 }
 else
 {
-  @if (MoviesState.Movies.Count > 0)
+  @if (MoviesState.Value.Movies.Count > 0)
   {
     <div class="card-columns">
-      @foreach (var movie in MoviesState.Movies)
+      @foreach (var movie in MoviesState.Value.Movies)
       {
         <div class="card" style="width: 17rem;">
           <img class="card-img-top" src="@movie.BannerUrl">
