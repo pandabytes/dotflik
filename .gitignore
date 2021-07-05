@@ -342,3 +342,6 @@ healthchecksdb
 # Ignore temp folders
 tmp/
 temp/
+
+# Ignore compiled Javascript files
+src/**/wwwroot/js

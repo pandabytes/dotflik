@@ -9,14 +9,23 @@
     <PackageReference Include="Google.Protobuf" Version="3.17.2" />
     <PackageReference Include="Grpc.Net.Client" Version="2.37.0" />
     <PackageReference Include="Grpc.Net.Client.Web" Version="2.37.0" />
+
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.6" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.3.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
     <PackageReference Include="Grpc.Tools" Version="2.38.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <GeneratePathProperty>true</GeneratePathProperty>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dotflik.Infrastructure\Dotflik.Infrastructure.csproj" />
   </ItemGroup>
 
   <!-- Dotflik protobuf files -->
@@ -52,9 +61,13 @@
       <Link>protos\google\%(RecursiveDir)/%(FileName)%(Extension)</Link>
     </None>
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\Dotflik.Application\Dotflik.Application.csproj" />
-    <ProjectReference Include="..\Dotflik.Infrastructure\Dotflik.Infrastructure.csproj" />
+    <Compile Remove="node_modules\**" />
+    <Content Remove="node_modules\**" />
+    <EmbeddedResource Remove="node_modules\**" />
+    <None Remove="node_modules\**" />
+    <TypeScriptCompile Remove="node_modules\**" />
   </ItemGroup>
 
 </Project>

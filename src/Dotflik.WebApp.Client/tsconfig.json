@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "moduleResolution": "Node",
+    "sourceMap": true,
+    "target": "ES2015",
+    "outDir": "wwwroot/js"
+  },
+  "include": [
+    "Interop/*.ts"
+  ],
+  "exclude": [
+    "node_modules", "wwwroot"
+  ]
+}

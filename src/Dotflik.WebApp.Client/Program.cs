@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.JSInterop;
 
 using Fluxor;
 
@@ -15,6 +16,7 @@ using Dotflik.Protobuf;
 using Dotflik.Infrastructure;
 using Dotflik.Application.Validation;
 using Dotflik.WebApp.Client.Settings;
+using Dotflik.WebApp.Client.Interop;
 
 namespace Dotflik.WebApp.Client
 {
@@ -33,6 +35,8 @@ namespace Dotflik.WebApp.Client
 
       builder.Services.AddDataAnnotationValidator();
 
+      builder.Services.AddSingleton<ModalBootstrap>();
+
       builder.Services.AddFluxor(o => o.ScanAssemblies(typeof(Program).Assembly));
 
       builder.Services.AddSingleton(sp =>
@@ -45,11 +49,6 @@ namespace Dotflik.WebApp.Client
 
         return grpcSettings;
       });
-
-      // Initial call to validate the settings right at start up
-      _ = builder.Build()
-                 .Services
-                 .GetRequiredService<GrpcSettings>();
 
       // Add grpc clients
       builder.Services.AddSingleton(sp =>
@@ -72,7 +71,16 @@ namespace Dotflik.WebApp.Client
         return new GenreService.GenreServiceClient(channel);
       });
 
-      await builder.Build().RunAsync();
+      var webHost = builder.Build();
+      var services = webHost.Services;
+
+      // Get service to validate the settings right at start up
+      _ = services.GetRequiredService<GrpcSettings>();
+      
+      await services.GetRequiredService<ModalBootstrap>()
+                    .LoadModuleAsync();
+
+      await webHost.RunAsync();
     }
   }
 
