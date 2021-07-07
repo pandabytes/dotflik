@@ -83,6 +83,7 @@ namespace Dotflik.WebApp.Client.Interop
   /// <summary>
   /// This class exposes the functions defined in the module "Interop/modalBootstrap.ts".
   /// See https://getbootstrap.com/docs/4.0/components/modal/#usage.
+  /// All methods of this class are asynchronous.
   /// </summary>
   public class ModalBootstrap : JavascriptModule
   {
@@ -99,7 +100,7 @@ namespace Dotflik.WebApp.Client.Interop
     /// </remarks>
     /// <param name="modalId">Id of the modal</param>
     /// <returns>Empty task</returns>
-    public async Task ShowModal(string modalId)
+    public async Task ShowModalAsync(string modalId)
     {
       if (m_module is not null)
       {
@@ -116,7 +117,7 @@ namespace Dotflik.WebApp.Client.Interop
     /// </remarks>
     /// <param name="modalId">Id of the modal</param>
     /// <returns>Empty task</returns>
-    public async Task HideModal(string modalId)
+    public async Task HideModalAsync(string modalId)
     {
       if (m_module is not null)
       {

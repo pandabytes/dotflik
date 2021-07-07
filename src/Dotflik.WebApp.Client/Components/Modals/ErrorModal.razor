@@ -1,0 +1,65 @@
+﻿@inject IJSRuntime JSRuntime
+@inherits ModalTemplate
+
+@{
+  base.BuildRenderTree(__builder);
+}
+
+@code {
+  private const string ErrorImageUrl = "https://icons.iconarchive.com/icons/papirus-team/papirus-status/256/dialog-error-icon.png";
+  private const string ErrorId = "ErrorId";
+
+  /// <summary>
+  /// The error message to display.
+  /// </summary>
+  [Parameter]
+  public string ErrorMessage { get; set; } = string.Empty;
+
+  /// <summary>
+  /// The error title to display.
+  /// </summary>
+  [Parameter]
+  public string ErrorTitle { get; set; } = "An error has occured";
+
+  /// <summary>
+  /// Refresh the browser when called.
+  /// </summary>
+  /// <returns>Empty task</returns>
+  private async Task RefreshButtonClickHandler()
+    => await JSRuntime.InvokeVoidAsync("window.location.reload", false);
+
+  /// <inheritdoc/>
+  protected override void SetHeader()
+    => m_modalHeader = __builder =>
+    {
+        <div class="modal-header error-header">
+          <h5 class="modal-title error-title">
+            <img class="card-img-top error-img" alt="Error" src="@ErrorImageUrl" />
+            @ErrorTitle
+          </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      };
+
+  /// <inheritdoc/>
+  protected override void SetBody()
+    => m_modalBody = __builder =>
+      {
+        <div class="modal-body">
+          <p>@ErrorMessage</p>
+        </div>
+      };
+
+  /// <inheritdoc/>
+  protected override void SetFooter()
+    => m_modalFooter = __builder =>
+      {
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-dismiss="modal">Dismiss</button>
+          <button class="btn btn-primary" @onclick="RefreshButtonClickHandler">Refresh</button>
+        </div>
+      };
+
+}

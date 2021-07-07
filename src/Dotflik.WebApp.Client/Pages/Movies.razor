@@ -3,49 +3,48 @@
 
 <h3>Movies</h3>
 
-@if (m_errorOccurred)
+<ErrorModal @ref="UnableToFetchErrorModal"
+            ModalId="UnableToFetch"
+            ErrorTitle="Cannot fetch movies"
+            ErrorMessage="Unable to fetch movies. Please try again." />
+
+@if (MoviesState.Value.Movies.Count > 0)
 {
-  <Error ErrorMessage="Unable to fetch movies. Please try again." />
+  <div class="card-columns">
+    @foreach (var movie in MoviesState.Value.Movies)
+    {
+      <div class="card" style="width: 17rem;">
+        <img class="card-img-top" src="@movie.BannerUrl">
+
+        <div class="card-body">
+          <h3 class="card-title">@movie.Title</h3>
+          <h5 class="card-subtitle">@movie.Year</h5>
+        </div>
+
+        @foreach (var genre in movie.Genres)
+        {
+          <a href="#" class="badge badge-pill badge-primary" style="margin: 5px 5px;">@genre.Name</a>
+        }
+
+        <div class="card-footer">
+          <small class="text-muted">
+            <button class="btn btn-primary" @onclick="e => SelectMovie(movie)"
+                    data-toggle="modal" data-target="#@MovieModalId">
+              More Info
+            </button>
+          </small>
+        </div>
+
+      </div>
+    }
+  </div>
+
+  <MovieDetails Movie="@m_selectMovie" MovieModalId="@MovieModalId" />
 }
 else
 {
-  @if (MoviesState.Value.Movies.Count > 0)
-  {
-    <div class="card-columns">
-      @foreach (var movie in MoviesState.Value.Movies)
-      {
-        <div class="card" style="width: 17rem;">
-          <img class="card-img-top" src="@movie.BannerUrl">
-
-          <div class="card-body">
-            <h3 class="card-title">@movie.Title</h3>
-            <h5 class="card-subtitle">@movie.Year</h5>
-          </div>
-
-          @foreach (var genre in movie.Genres)
-          {
-            <a href="#" class="badge badge-pill badge-primary" style="margin: 5px 5px;">@genre.Name</a>
-          }
-
-          <div class="card-footer">
-            <small class="text-muted">
-              <button class="btn btn-primary" @onclick="e => SelectMovie(movie)"
-                      data-toggle="modal" data-target="#@MovieModalId">
-                More Info
-              </button>
-            </small>
-          </div>
-
-        </div>
-      }
-    </div>
-
-    <MovieDetails Movie="@m_selectMovie" MovieModalId="@MovieModalId" />
-  }
-  else
-  {
-    <Loading></Loading>
-  }
+  <Loading></Loading>
 }
+
 
 

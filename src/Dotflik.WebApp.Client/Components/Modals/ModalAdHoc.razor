@@ -1,0 +1,50 @@
+﻿@*
+  This component allows the flexibility to create a modal dialog on demand (ad hoc). This component
+  exposes some of the protected fields of ModalTemplate as component parameters.
+*@
+
+@inherits ModalTemplate
+
+@{
+  base.BuildRenderTree(__builder);
+}
+
+@code {
+
+  /// <summary>
+  /// The UI fragment of the modal header. To render the
+  /// header correctly, wrap it in 
+  /// &lt;div class="modal-header"&gt;&lt;/div&gt;
+  /// </summary>
+  [Parameter]
+  public RenderFragment? ModalHeader
+  {
+    get => m_modalHeader;
+    set => m_modalHeader = value;
+  }
+
+  /// <summary>
+  /// The UI fragment of the modal body. To render the
+  /// body correctly, wrap it in 
+  /// &lt;div class="modal-body"&gt;&lt;/div&gt;
+  /// </summary>
+  [Parameter]
+  public RenderFragment? ModalBody
+  {
+    get => m_modalBody;
+    set => m_modalBody = value;
+  }
+
+  /// <summary>
+  /// The UI fragment of the modal footer. To render the
+  /// header correctly, wrap it in 
+  /// &lt;div class="modal-footer"&gt;&lt;/div&gt;
+  /// </summary>
+  [Parameter]
+  public RenderFragment? ModalFooter
+  {
+    get => m_modalFooter;
+    set => m_modalFooter = value;
+  }
+
+}

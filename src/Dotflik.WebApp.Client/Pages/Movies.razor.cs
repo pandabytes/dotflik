@@ -8,8 +8,8 @@ using Grpc.Core;
 using Dotflik.Protobuf;
 using Dotflik.Protobuf.Pagination;
 using Dotflik.WebApp.Client.Mappings;
-using Dotflik.WebApp.Client.Store;
 using Dotflik.WebApp.Client.Store.Movies;
+using Dotflik.WebApp.Client.Components.Modals;
 using Microsoft.AspNetCore.Components;
 
 namespace Dotflik.WebApp.Client.Pages
@@ -17,6 +17,17 @@ namespace Dotflik.WebApp.Client.Pages
   public partial class Movies : FluxorComponent
   {
     private const string MovieModalId = "movieModal";
+
+    /// <summary>
+    /// The currently selected movie.
+    /// </summary>
+    private Domain.Aggregates.Movie? m_selectMovie;
+
+    /// <summary>
+    /// The error modal that displays an error message telling
+    /// user it is unable to fetch movies when the app first loads.
+    /// </summary>
+    private ErrorModal? UnableToFetchErrorModal { get; set; }
 
     [Inject]
     protected MovieService.MovieServiceClient MovieService { get; set; } = null!;
@@ -30,31 +41,30 @@ namespace Dotflik.WebApp.Client.Pages
     [Inject]
     protected IState<MoviesState> MoviesState { get; set; } = null!;
 
-    /// <summary>
-    /// Indicate an error has occured on this page
-    /// </summary>
-    private bool m_errorOccurred;
-
-    /// <summary>
-    /// The currently selected movie
-    /// </summary>
-    private Domain.Aggregates.Movie? m_selectMovie;
-
     /// <inheritdoc/>
     protected async override Task OnInitializedAsync()
     {
-      var tuple = await GetMovies(5);
-      if (tuple is not null)
+      // Movies are not available initially so fetch them
+      if (MoviesState.Value.Movies.Count == 0)
       {
-        var (movies, _) = tuple.Value;
-        Dispatcher.Dispatch(new MoviesAddMoviesAction(movies));
+        var tuple = await GetMovies(MoviesState.Value.PageSize);
+        if (tuple is not null)
+        {
+          var (movies, _) = tuple.Value;
+          Dispatcher.Dispatch(new MoviesAddMoviesAction(movies));
+        }
+        else
+        {
+          if (UnableToFetchErrorModal is not null)
+          {
+            await UnableToFetchErrorModal.OpenAsync();
+          }
+        }
       }
-
-      m_errorOccurred = tuple is null;
     }
 
     /// <summary>
-    /// Get the movies via gRPC movie service
+    /// Get the movies via gRPC movie service.
     /// </summary>
     /// <param name="pageSize"></param>
     /// <param name="token"></param>
@@ -78,7 +88,7 @@ namespace Dotflik.WebApp.Client.Pages
     }
 
     /// <summary>
-    /// Save the selected movie
+    /// Save the selected movie.
     /// </summary>
     /// <param name="movie">Selected movie</param>
     private void SelectMovie(Domain.Aggregates.Movie movie)

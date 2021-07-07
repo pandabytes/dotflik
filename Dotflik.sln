@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotflik.WebApp.Server.UnitT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotflik.WebApp.Client", "src\Dotflik.WebApp.Client\Dotflik.WebApp.Client.csproj", "{A46138F7-05C7-424F-A662-208FFD78CBCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dotflik.WebApp.Client.UnitTests", "tests\Dotflik.WebApp.Client.UnitTests\Dotflik.WebApp.Client.UnitTests.csproj", "{DFEA147E-029B-42FC-9F4F-8E459EF1E9A8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dotflik.WebApp.Client.UnitTests", "tests\Dotflik.WebApp.Client.UnitTests\Dotflik.WebApp.Client.UnitTests.csproj", "{DFEA147E-029B-42FC-9F4F-8E459EF1E9A8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
