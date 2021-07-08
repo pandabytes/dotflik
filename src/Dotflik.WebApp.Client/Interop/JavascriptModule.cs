@@ -9,6 +9,8 @@ namespace Dotflik.WebApp.Client.Interop
   /// </summary>
   public abstract class JavascriptModule
   {
+    private IJSObjectReference? m_module;
+
     /// <summary>
     /// The JS runtime used to run Javascript code.
     /// </summary>
@@ -16,10 +18,15 @@ namespace Dotflik.WebApp.Client.Interop
 
     /// <summary>
     /// The Javascript module that contains exported variables,
-    /// classes, functions, etc... If null, then the module
-    /// has not been loaded yet.
+    /// classes, functions, etc...
     /// </summary>
-    protected IJSObjectReference? m_module;
+    /// <exception cref="InvalidOperationException">
+    /// Thrown when the module is null (aka not loaded yet).
+    /// </exception>
+    protected IJSObjectReference Module
+    {
+      get => m_module ?? throw new InvalidOperationException($"Module at \"{ModuleScriptPath}\" is not loaded.");
+    }
 
     /// <summary>
     /// Constructor.

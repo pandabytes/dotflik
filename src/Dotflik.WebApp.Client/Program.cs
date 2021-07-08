@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.JSInterop;
 
 using Fluxor;
 
@@ -76,7 +75,7 @@ namespace Dotflik.WebApp.Client
 
       // Get service to validate the settings right at start up
       _ = services.GetRequiredService<GrpcSettings>();
-      
+
       await services.GetRequiredService<ModalBootstrap>()
                     .LoadModuleAsync();
 
