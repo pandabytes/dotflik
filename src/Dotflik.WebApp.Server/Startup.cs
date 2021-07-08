@@ -1,7 +1,4 @@
 using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,7 +9,6 @@ using Microsoft.Extensions.Configuration;
 
 using Dotflik.Application.Repositories;
 using Dotflik.Application.Repositories.Settings;
-using Dotflik.Application.Validation;
 using Dotflik.Domain.Exceptions;
 using Dotflik.Infrastructure;
 using Dotflik.WebApp.Server.Interceptors;
@@ -96,50 +92,6 @@ namespace Dotflik.WebApp.Server
           endpoints.MapGrpcReflectionService();
         }
       });
-    }
-
-    /// <summary>
-    /// Validate the data annotations on the settings object
-    /// in <paramref name="configuration"/> with key <paramref name="sectionKey"/>.
-    /// </summary>
-    /// <remarks>
-    /// If no data annotation is specified in type <typeparamref name="T"/>, then
-    /// validation will always pass
-    /// </remarks>
-    /// 
-    /// <exception cref="ValidationException">
-    /// Thrown when settings aren't available or fail the data annotation validation
-    /// </exception>
-    /// <typeparam name="T">
-    /// A class that has <see cref="ValidationAttribute"/> marked on its properties
-    /// </typeparam>
-    /// 
-    /// <param name="configuration">Configuration object</param>
-    /// <param name="sectionKey">Key in the <paramref name="configuration"/></param>
-    /// 
-    /// <returns>The settings object found at 
-    /// <paramref name="sectionKey"/> in the <paramref name="configuration"/>
-    /// </returns>
-    private static T ValidateDataAnnotations<T>(IConfiguration configuration, string sectionKey)
-      where T : class
-    {
-      var settings = configuration.GetSection(sectionKey).Get<T>();
-      if (settings == null)
-      {
-        throw new ValidationException($"Settings \"{sectionKey}\" is not provided in the configuration");
-      }
-
-      var validationResults = new List<ValidationResult>();
-      var validationContext = new ValidationContext(settings, null, null);
-
-      if (!Validator.TryValidateObject(settings, validationContext, validationResults, true))
-      {
-        var errorMessages = validationResults.Select(vr => vr.ErrorMessage);
-        var exMessage = $"Validation failed for section \"{sectionKey}\";" + string.Join(";", errorMessages);
-        throw new ValidationException(exMessage);
-      }
-
-      return settings;
     }
 
   }
