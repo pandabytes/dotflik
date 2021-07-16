@@ -8,11 +8,12 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
 using Dotflik.Protobuf;
-using Dotflik.Protobuf.Resources;
 using Dotflik.Protobuf.Pagination;
 
-using Dotflik.Application.Pagination;
+using Dotflik.Application.Paginations;
+using Dotflik.Application.Paginations.Args;
 using Dotflik.Application.Repositories;
+using Dotflik.Infrastructure;
 using Dotflik.WebApp.Server.Mappings;
 
 namespace Dotflik.WebApp.Server.Services
@@ -23,16 +24,40 @@ namespace Dotflik.WebApp.Server.Services
   public class MovieService : Protobuf.MovieService.MovieServiceBase
   {
     protected const int MaxPageSize = 50;
+    protected const PaginationTokenType MovieTokenType = PaginationTokenType.LimitOffset;
 
     private readonly ILogger<MovieService> m_logger;
     private readonly IMovieRepository m_movieRepository;
+    private readonly PaginationTokenFactory m_createToken;
+    //private readonly CreateLimitOffsetToken m_createLimitOffsetToken;
 
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="movieRepository">Movie repository object</param>
-    public MovieService(IMovieRepository movieRepository, ILogger<MovieService> logger)
-      => (m_movieRepository, m_logger) = (movieRepository, logger);
+    public MovieService(IMovieRepository movieRepository, 
+                        ILogger<MovieService> logger,
+                        PaginationTokenFactory createToken)
+    {
+      m_movieRepository = movieRepository;
+      m_logger = logger;
+      m_createToken = createToken;
+      //m_createLimitOffsetToken = createLimitOffsetToken;
+    }
+
+    ///// <summary>
+    ///// Create a pagination token object of type
+    ///// <see cref="MovieTokenType"/>.
+    ///// </summary>
+    ///// <remarks>
+    ///// This method provides a convinient way to create the
+    ///// pagination object without manually casting to 
+    ///// the desired pagination token class.
+    ///// </remarks>
+    ///// <param name="token">Token string</param>
+    ///// <returns>A limit offset pagination token object</returns>
+    //private LimitOffsetPaginationToken CreateToken(string token)
+    //  => (LimitOffsetPaginationToken) m_createToken(MovieTokenType, token);
 
     /// <inheritdoc/>
     public override Task<GetMaxPageSizeResponse> GetMaxPageSize(Empty request, ServerCallContext context)
@@ -47,8 +72,8 @@ namespace Dotflik.WebApp.Server.Services
     {
       var (pageSize, pageToken) = (request.PageSize, request.PageToken);
 
-      var offsetPageToken = new OffsetPageToken(pageToken);
-      var (limit, offset) = (offsetPageToken.Limit, offsetPageToken.Offset);
+      var limitOffsetPaginationToken = (LimitOffsetPaginationToken) m_createToken(MovieTokenType, pageToken);
+      var (limit, offset) = (limitOffsetPaginationToken.Limit, limitOffsetPaginationToken.Offset);
 
       // Constraint the page size to be within max range
       if (pageSize > MaxPageSize || pageSize == 0)
@@ -63,8 +88,9 @@ namespace Dotflik.WebApp.Server.Services
       var nextPageToken = string.Empty;
       if (movies.Count() == pageSize)
       {
-        var nextOffsetPageToken = new OffsetPageToken(pageSize, offset + pageSize);
-        nextPageToken = nextOffsetPageToken.ToToken();
+        var tokenArgs = new LimitOffsetPaginationTokenArgs { Limit = pageSize, Offset = offset + pageSize };
+        var nextLimitOffsetPaginationToken = m_createToken(MovieTokenType, tokenArgs);
+        nextPageToken = nextLimitOffsetPaginationToken.Token;
       }
 
       var paginationResponse = new PaginationRespone { NextPageToken = nextPageToken };
