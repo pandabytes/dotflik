@@ -120,15 +120,15 @@ namespace Dotflik.WebApp.Server.Interceptors
     protected IPaginationToken GetPaginationToken(string pageToken)
     {
       var exceptions = new Dictionary<PaginationTokenType, Exception>();
-      foreach (PaginationTokenType enumValue in Enum.GetValues(typeof(PaginationTokenType)))
+      foreach (PaginationTokenType tokenType in Enum.GetValues(typeof(PaginationTokenType)))
       {
         try
         {
-          return m_tokenFactory(enumValue, pageToken);
+          return m_tokenFactory(tokenType, pageToken);
         }
         catch (Exception ex) when (ex is NotSupportedException || ex is PageTokenFormatException)
         {
-          exceptions.Add(enumValue, ex);
+          exceptions.Add(tokenType, ex);
         }
       }
 

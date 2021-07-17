@@ -1,6 +1,8 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 
+using Dotflik.Application.Paginations;
+using Dotflik.Application.Paginations.Args;
 using Dotflik.Application.Repositories;
 using Dotflik.Application.Repositories.Settings;
 using Dotflik.Application.Validation;
@@ -12,6 +14,9 @@ namespace Dotflik.Infrastructure.UnitTests
 {
   public class DependencyInjectionTests
   {
+    public class DummyPaginationTokenArgs : PaginationTokenArgs
+    {}
+
     [Fact]
     public void AddMovieRepository_SupportDatabase_MovieRepositoryIsAdded()
     {
@@ -84,6 +89,69 @@ namespace Dotflik.Infrastructure.UnitTests
       // No need to call any Xunit.Assert because GetRequiredService
       // would throw an exception if the service is not registered
       _ = provider.GetRequiredService<IDataAnnotationValidator>();
+    }
+
+    [Fact]
+    public void AddPaginationTokenFactory_SimpleCall_TokenFactoryIsAdded()
+    {
+      // Arrange
+      var services = new ServiceCollection();
+
+      // Act
+      services.AddPaginationTokenFactory();
+      var provider = services.BuildServiceProvider();
+
+      // Assert
+      // No need to call any Xunit.Assert because GetRequiredService
+      // would throw an exception if the service is not registered
+      _ = provider.GetRequiredService<PaginationTokenFactory>();
+    }
+
+    [Fact]
+    public void TokenFactory_NullTokenValueAndTokenTypeNotSupported_ThrowsNotSupportedException()
+    {
+      // Arrange
+      var services = new ServiceCollection();
+      services.AddPaginationTokenFactory();
+      var provider = services.BuildServiceProvider();
+      var tokenFactory = provider.GetRequiredService<PaginationTokenFactory>();
+
+      // Act & Assert
+      var invalidTokenType = (PaginationTokenType) (-1);
+      var tokenArgs = new DummyPaginationTokenArgs { Value = null };
+      Assert.Throws<NotSupportedException>(() => tokenFactory(invalidTokenType, tokenArgs));
+    }
+
+    [Fact]
+    public void TokenFactory_NonNullTokenValueAndTokenTypeNotSupported_ThrowsNotSupportedException()
+    {
+      // Arrange
+      var services = new ServiceCollection();
+      services.AddPaginationTokenFactory();
+      var provider = services.BuildServiceProvider();
+      var tokenFactory = provider.GetRequiredService<PaginationTokenFactory>();
+
+      // Act & Assert
+      var invalidTokenType = (PaginationTokenType)(-1);
+      var tokenArgs = new DummyPaginationTokenArgs { Value = "dummy_token" };
+      Assert.Throws<NotSupportedException>(() => tokenFactory(invalidTokenType, tokenArgs));
+    }
+
+    [Fact]
+    public void TokenFactory_TokenTypeAndTokenArgsDoNotMatch_ThrowsArgumentException()
+    {
+      // Arrange
+      var services = new ServiceCollection();
+      services.AddPaginationTokenFactory();
+      var provider = services.BuildServiceProvider();
+      var tokenFactory = provider.GetRequiredService<PaginationTokenFactory>();
+
+      // Act & Assert
+      var tokenArgs = new DummyPaginationTokenArgs { Value = null };
+      foreach (PaginationTokenType tokenType in Enum.GetValues(typeof(PaginationTokenType)))
+      {
+        Assert.Throws<ArgumentException>(() => tokenFactory(tokenType, tokenArgs));
+      }
     }
 
   }

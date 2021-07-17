@@ -117,7 +117,7 @@ namespace Dotflik.Infrastructure
           }
         }
 
-        var mismatchArgsMessage = $"Type of {nameof(tokenArgs)} is {tokenType.GetType().FullName} in which " + 
+        var mismatchArgsMessage = $"Type of {nameof(tokenArgs)} is {tokenArgs.GetType().FullName} in which " + 
                                   $"doesn't match with token type {tokenType}";
 
         // Construct token using arguments specific to each token type
