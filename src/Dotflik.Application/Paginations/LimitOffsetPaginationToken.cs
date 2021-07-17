@@ -10,7 +10,6 @@ namespace Dotflik.Application.Paginations
   public abstract class LimitOffsetPaginationToken : PaginationToken
   {
     private int m_limit;
-
     private int m_offset;
 
     /// <inheritdoc/>
@@ -24,7 +23,7 @@ namespace Dotflik.Application.Paginations
     /// </exception>
     public int Limit
     {
-      get { return m_limit; }
+      get => m_limit;
       init
       {
         if (value < 0)
@@ -43,7 +42,7 @@ namespace Dotflik.Application.Paginations
     /// </exception>
     public int Offset
     {
-      get { return m_offset; }
+      get => m_offset;
       init
       {
         if (value < 0)
@@ -55,6 +54,10 @@ namespace Dotflik.Application.Paginations
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <see cref="Limit"/> and <see cref="Offset"/> will be set to 0
+    /// if <paramref name="token"/> is empty.
+    /// </remarks>
     public LimitOffsetPaginationToken(string token) : base(token) { }
 
     /// <summary>

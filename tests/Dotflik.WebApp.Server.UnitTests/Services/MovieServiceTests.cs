@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 using Grpc.Core;
 using Google.Protobuf.WellKnownTypes;
@@ -10,6 +11,7 @@ using Google.Protobuf.WellKnownTypes;
 using Dotflik.Protobuf;
 using Dotflik.Protobuf.Pagination;
 using Dotflik.Application.Repositories;
+using Dotflik.Infrastructure;
 using Dotflik.WebApp.Server.Mappings;
 
 using Bogus;
@@ -44,15 +46,20 @@ namespace Dotflik.WebApp.Server.Services.UnitTests
     /// </summary>
     public MovieServiceTests()
     {
+      var services = new ServiceCollection();
+      services.AddPaginationTokenFactory();
+
+      var provider = services.BuildServiceProvider();
+      var tokenFactory = provider.GetRequiredService<PaginationTokenFactory>();
+
       var logger = new Mock<ILogger<MovieService>>().Object;
 
       m_serverContext = new Mock<ServerCallContext>().Object;
-
       m_movieRepositoryMock = new Mock<IMovieRepository>();
-      m_movieService = new MovieService(m_movieRepositoryMock.Object, logger);
+      m_movieService = new MovieService(m_movieRepositoryMock.Object, logger, tokenFactory);
 
-      var maxPageSizeRespond = m_movieService.GetMaxPageSize(new Empty(), m_serverContext);
-      m_maxPageSize = maxPageSizeRespond.Result.MaxPageSize;
+      var maxPageSizeResponse = m_movieService.GetMaxPageSize(new Empty(), m_serverContext);
+      m_maxPageSize = maxPageSizeResponse.Result.MaxPageSize;
     }
 
     [Fact]

@@ -30,10 +30,18 @@ namespace Dotflik.WebApp.Server.Interceptors
 
     protected const string PageSizeLessThanZeroMessage = "Page size must be at least 0";
 
-    private readonly PaginationTokenFactory m_createToken;
+    private readonly PaginationTokenFactory m_tokenFactory;
 
-    public PaginationRequestInterceptor(PaginationTokenFactory createToken)
-      => m_createToken = createToken;
+    public PaginationRequestInterceptor(PaginationTokenFactory tokenFactory)
+      => m_tokenFactory = tokenFactory;
+
+    /// <summary>
+    /// This constructor is only used for unit tests.
+    /// </summary>
+    protected PaginationRequestInterceptor() 
+    {
+      m_tokenFactory = null!;
+    }
 
     /// <inheritdoc/>
     public override async Task<TResponse> UnaryServerHandler<TRequest, TResponse>(TRequest request, ServerCallContext context, UnaryServerMethod<TRequest, TResponse> continuation)
@@ -77,7 +85,7 @@ namespace Dotflik.WebApp.Server.Interceptors
     /// <param name="limitOffsetToken">The token to be validated</param>
     /// <param name="pageSize">Page size used to check consistency 
     /// with <paramref name="limitOffsetToken"/></param>
-    private static void ValidateToken(LimitOffsetPaginationToken limitOffsetToken, int pageSize)
+    protected static void ValidateToken(LimitOffsetPaginationToken limitOffsetToken, int pageSize)
     {
       var (limit, offset) = (limitOffsetToken.Limit, limitOffsetToken.Offset);
 
@@ -109,14 +117,14 @@ namespace Dotflik.WebApp.Server.Interceptors
     /// of the expected formats.</exception>
     /// <param name="pageToken">Token string</param>
     /// <returns>A pagination token object</returns>
-    private IPaginationToken GetPaginationToken(string pageToken)
+    protected IPaginationToken GetPaginationToken(string pageToken)
     {
       var exceptions = new Dictionary<PaginationTokenType, Exception>();
       foreach (PaginationTokenType enumValue in Enum.GetValues(typeof(PaginationTokenType)))
       {
         try
         {
-          return m_createToken(enumValue, pageToken);
+          return m_tokenFactory(enumValue, pageToken);
         }
         catch (Exception ex) when (ex is NotSupportedException || ex is PageTokenFormatException)
         {

@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Dotflik.Application\Dotflik.Application.csproj" />
+    <ProjectReference Include="..\..\src\Dotflik.Infrastructure\Dotflik.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

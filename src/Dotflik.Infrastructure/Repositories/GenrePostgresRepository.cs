@@ -11,7 +11,7 @@ using Npgsql;
 
 namespace Dotflik.Infrastructure.Repositories
 {
-  public class GenrePostgresRepository : Repository, IGenreRepository
+  internal class GenrePostgresRepository : Repository, IGenreRepository
   {
     public GenrePostgresRepository(DatabaseSettings dbSettings) : base(dbSettings) { }
 

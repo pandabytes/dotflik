@@ -18,7 +18,8 @@ namespace Dotflik.Application.Paginations
     public string Token { get; protected set; } = string.Empty;
 
     /// <summary>
-    /// Construct the token object from <paramref name="token"/>.
+    /// Construct the token object from <paramref name="token"/>. Empty string
+    /// is acceptable.
     /// </summary>
     /// <exception cref="PageTokenFormatException">
     /// Thrown when <paramref name="token"/> is not in the correct format.
@@ -31,8 +32,7 @@ namespace Dotflik.Application.Paginations
     }
 
     /// <summary>
-    /// This constructor allows derived classes to define
-    /// their custom constructors with different sets of parameters.
+    /// Construct object with token arguments.
     /// </summary>
     /// <param name="tokenArgs">Arguments to construct the token object</param>
     protected PaginationToken(PaginationTokenArgs tokenArgs) { }
