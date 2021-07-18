@@ -28,8 +28,7 @@
 
         <div class="card-footer">
           <small class="text-muted">
-            <button class="btn btn-primary" @onclick="e => SelectMovie(movie)"
-                    data-toggle="modal" data-target="#@MovieModalId">
+            <button class="btn btn-primary" @onclick="e => OpenSelectedMovie(movie)">
               More Info
             </button>
           </small>
@@ -39,7 +38,7 @@
     }
   </div>
 
-  <MovieDetails Movie="@m_selectMovie" MovieModalId="@MovieModalId" />
+  <MovieDetailsModal @ref="MovieDetailsModal" ModalId="@MovieModalId" Movie="m_selectMovie" />
 }
 else
 {

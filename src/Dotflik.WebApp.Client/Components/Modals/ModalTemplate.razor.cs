@@ -115,14 +115,14 @@ namespace Dotflik.WebApp.Client.Components.Modals
     /// </summary>
     /// <returns>Empty task</returns>
     public async Task OpenAsync()
-      => await ModalBootstrap.ShowModalAsync(m_modalId);
+      => await ModalBootstrap.ShowModalAsync(ModalId);
 
     /// <summary>
     /// Hide the modal dialog asynchronously.
     /// </summary>
     /// <returns>Empty task</returns>
     public async Task CloseAsync()
-      => await ModalBootstrap.HideModalAsync(m_modalId);
+      => await ModalBootstrap.HideModalAsync(ModalId);
 
     /// <summary>
     /// Set the <see cref="m_modalHeader"/> to the desired UI fragment.

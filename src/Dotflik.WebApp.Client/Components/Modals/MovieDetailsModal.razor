@@ -1,20 +1,41 @@
-﻿
-@* Display a modal popup with more detail information about the selected movie *@
-<div class="modal fade" id="@MovieModalId"
-     tabindex="-1" role="dialog"
-     aria-labelledby="@MovieTitleId" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    @if (Movie is not null)
-    {
-      <div class="modal-content">
+﻿@inherits ModalTemplate
 
+@* Display a modal popup with more detail information about the selected movie *@
+
+@{
+  base.BuildRenderTree(__builder);
+}
+
+@code
+{
+  /// <summary>
+  /// The movie to be displayed in the modal. If the movie
+  /// is null, then the modal content will not be rendered.
+  /// </summary>
+  [Parameter]
+  public Domain.Aggregates.Movie? Movie { get; set; }
+
+  /// <inheritdoc/>
+  protected override void SetHeader()
+    => m_modalHeader = __builder =>
+    {
+      if (Movie is not null)
+      { 
         <div class="modal-header">
-          <h2 class="modal-title" id="@MovieTitleId">@Movie.Title (@Movie.Year)</h2>
+          <h2 class="modal-title">@Movie.Title (@Movie.Year)</h2>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+      }
+    };
 
+  /// <inheritdoc/>
+  protected override void SetBody()
+    => m_modalBody = __builder =>
+    {
+      if (Movie is not null)
+      { 
         <div class="modal-body">
           <div class="card">
             <img class="card-img-top" src="@Movie.BannerUrl">
@@ -36,19 +57,7 @@
             </div>
           </div>
         </div>
+      }
+    };
 
-      </div>
-    }
-  </div>
-</div>
-
-@code
-{
-  private const string MovieTitleId = "movieTitle";
-
-  [Parameter]
-  public Domain.Aggregates.Movie? Movie { get; set; }
-
-  [Parameter]
-  public string MovieModalId { get; set; } = "movieModal";
 }

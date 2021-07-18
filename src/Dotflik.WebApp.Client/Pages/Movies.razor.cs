@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using Fluxor;
 using Fluxor.Blazor.Web.Components;
 using Grpc.Core;
+using Microsoft.AspNetCore.Components;
+
 using Dotflik.Protobuf;
 using Dotflik.Protobuf.Pagination;
 using Dotflik.WebApp.Client.Mappings;
 using Dotflik.WebApp.Client.Store.Movies;
 using Dotflik.WebApp.Client.Components.Modals;
-using Microsoft.AspNetCore.Components;
 
 namespace Dotflik.WebApp.Client.Pages
 {
@@ -28,6 +30,11 @@ namespace Dotflik.WebApp.Client.Pages
     /// user it is unable to fetch movies when the app first loads.
     /// </summary>
     private ErrorModal? UnableToFetchErrorModal { get; set; }
+
+    /// <summary>
+    /// The movie modal that contains more details of a movie.
+    /// </summary>
+    private MovieDetailsModal? MovieDetailsModal { get; set; }
 
     [Inject]
     protected MovieService.MovieServiceClient MovieService { get; set; } = null!;
@@ -88,11 +95,17 @@ namespace Dotflik.WebApp.Client.Pages
     }
 
     /// <summary>
-    /// Save the selected movie.
+    /// Open the selected movie.
     /// </summary>
     /// <param name="movie">Selected movie</param>
-    private void SelectMovie(Domain.Aggregates.Movie movie)
-      => m_selectMovie = movie;
+    private async Task OpenSelectedMovie(Domain.Aggregates.Movie movie)
+    {
+      m_selectMovie = movie;
+      if (MovieDetailsModal is not null)
+      {
+        await MovieDetailsModal.OpenAsync();
+      }
+    }
 
   }
 }
