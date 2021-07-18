@@ -10,34 +10,36 @@
 
 @if (MoviesState.Value.Movies.Count > 0)
 {
-  <MovieDetailsModal @ref="MovieDetailsModal" ModalId="movieModal" Movie="m_selectMovie" />
+  <MovieDetailsModal @ref="MovieDetailsModal" ModalId="movieModal" Movie="m_selectMovie"/>
 
-  <div class="card-columns">
-    @foreach (var movie in MoviesState.Value.Movies)
-    {
-      <div class="card" style="width: 17rem;">
-        <img class="card-img-top" src="@movie.BannerUrl">
+  @for (int i = 0; i < NumMovieRows; i++)
+  { 
+    <div class="card-deck" style="margin: 20px 0">
+      @foreach (var movie in GetMoviesRange(i * NumMoviesPerRow, NumMoviesPerRow))
+      {
+        <div class="card">
+          <img class="card-img-top" src="@movie.BannerUrl">
 
-        <div class="card-body">
-          <h3 class="card-title">@movie.Title</h3>
-          <h5 class="card-subtitle">@movie.Year</h5>
+          <div class="card-body">
+            <h3 class="card-title">@movie.Title</h3>
+            <h5 class="card-subtitle">@movie.Year</h5>
+            @foreach (var genre in movie.Genres)
+            {
+              <a href="#" class="badge badge-pill badge-primary" style="margin: 20px 5px;">@genre.Name</a>
+            }
+          </div>
+
+          <div class="card-footer">
+            <small class="text-muted">
+              <button class="btn btn-primary" @onclick="e => OpenSelectedMovie(movie)">
+                More Info
+              </button>
+            </small>
+          </div>
         </div>
-
-        @foreach (var genre in movie.Genres)
-        {
-          <a href="#" class="badge badge-pill badge-primary" style="margin: 5px 5px;">@genre.Name</a>
-        }
-
-        <div class="card-footer">
-          <small class="text-muted">
-            <button class="btn btn-primary" @onclick="e => OpenSelectedMovie(movie)">
-              More Info
-            </button>
-          </small>
-        </div>
-      </div>
-    }
-  </div>
+      }
+    </div>
+  }
 
   <div class="container">
     <div class="col-md-12 text-center">
@@ -47,7 +49,7 @@
       </button>
     </div>
   </div>
-  
+
 }
 else
 {

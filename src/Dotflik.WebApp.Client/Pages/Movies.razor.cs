@@ -19,6 +19,60 @@ namespace Dotflik.WebApp.Client.Pages
   public partial class Movies : FluxorComponent
   {
     /// <summary>
+    /// Number of movies to be rendered per row.
+    /// </summary>
+    private const int NumMoviesPerRow = 5;
+
+    /// <summary>
+    /// Number of rows that would contain
+    /// at most <see cref="NumMoviesPerRow"/>.
+    /// </summary>
+    private int NumMovieRows
+    {
+      get
+      {
+        var movieCount = MoviesState.Value.Movies.Count;
+        if (movieCount == 0)
+        {
+          return 0;
+        }
+        if (movieCount <= NumMoviesPerRow)
+        {
+          return 1;
+        }
+        
+        var remainer = movieCount % NumMoviesPerRow;
+        return (movieCount / NumMoviesPerRow) + remainer;
+      }
+    }
+
+    /// <summary>
+    /// Get a shallow list of movies within the given range.
+    /// If the range is out of bound then an empty list is returned
+    /// or the number of movies up until <paramref name="count"/> 
+    /// are returned.
+    /// </summary>
+    /// <param name="index">Start index of the range</param>
+    /// <param name="count">Number of movies to get</param>
+    /// <returns>Shallow list of movies</returns>
+    private List<Domain.Aggregates.Movie> GetMoviesRange(int index, int count)
+    {
+      var subList = new List<Domain.Aggregates.Movie>();
+      var movies = MoviesState.Value.Movies;
+      var movieCount = movies.Count;
+
+      if (movieCount > 0)
+      {
+        for (int i = index; (i < index + count) && (i < movieCount); i++)
+        {
+          subList.Add(movies[i]);
+        }
+      }
+
+      return subList;
+    }
+
+    /// <summary>
     /// The currently selected movie.
     /// </summary>
     private Domain.Aggregates.Movie? m_selectMovie;
