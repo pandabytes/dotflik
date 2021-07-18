@@ -18,23 +18,43 @@ namespace Dotflik.WebApp.Client.Pages
 {
   public partial class Movies : FluxorComponent
   {
-    private const string MovieModalId = "movieModal";
-
     /// <summary>
     /// The currently selected movie.
     /// </summary>
     private Domain.Aggregates.Movie? m_selectMovie;
 
     /// <summary>
+    /// The current page token to request 
+    /// for the next set of movies.
+    /// </summary>
+    private string m_pageToken = string.Empty;
+
+    /// <summary>
     /// The error modal that displays an error message telling
     /// user it is unable to fetch movies when the app first loads.
     /// </summary>
-    private ErrorModal? UnableToFetchErrorModal { get; set; }
+    /// <remarks>
+    /// Should not be null since it is referenced from the razor code.
+    /// </remarks>
+    private ErrorModal UnableToFetchErrorModal { get; set; } = null!;
 
     /// <summary>
     /// The movie modal that contains more details of a movie.
     /// </summary>
-    private MovieDetailsModal? MovieDetailsModal { get; set; }
+    /// <remarks>
+    /// Should not be null since it is referenced from the razor code.
+    /// </remarks>
+    private MovieDetailsModal MovieDetailsModal { get; set; } = null!;
+
+    /// <summary>
+    /// The text of the load more movies button.
+    /// </summary>
+    private string LoadMoreMoviesButtonText { get; set; } = "Load more movies";
+
+    /// <summary>
+    /// Determine whether the load movie button is enabled.
+    /// </summary>
+    private bool LoadMoreMoviesButtonEnable => LoadMoreMoviesButtonText == "Load more movies";
 
     [Inject]
     protected MovieService.MovieServiceClient MovieService { get; set; } = null!;
@@ -54,19 +74,7 @@ namespace Dotflik.WebApp.Client.Pages
       // Movies are not available initially so fetch them
       if (MoviesState.Value.Movies.Count == 0)
       {
-        var tuple = await GetMovies(MoviesState.Value.PageSize);
-        if (tuple is not null)
-        {
-          var (movies, _) = tuple.Value;
-          Dispatcher.Dispatch(new MoviesAddMoviesAction(movies));
-        }
-        else
-        {
-          if (UnableToFetchErrorModal is not null)
-          {
-            await UnableToFetchErrorModal.OpenAsync();
-          }
-        }
+        await LoadMovies();
       }
     }
 
@@ -101,10 +109,48 @@ namespace Dotflik.WebApp.Client.Pages
     private async Task OpenSelectedMovie(Domain.Aggregates.Movie movie)
     {
       m_selectMovie = movie;
-      if (MovieDetailsModal is not null)
+      await MovieDetailsModal.OpenAsync();
+    }
+
+    /// <summary>
+    /// Load movies using the token <see cref="m_pageToken"/>
+    /// to the <see cref="MoviesState"/>. This method will also
+    /// update <see cref="m_pageToken"/> to the next page token
+    /// received from the movie service.
+    /// </summary>
+    /// <remarks>
+    /// If the method is unable to load movies, it will display
+    /// the <see cref="UnableToFetchErrorModal"/> modal.
+    /// </remarks>
+    /// <returns>Empty task</returns>
+    private async Task LoadMovies()
+    {
+      var tuple = await GetMovies(MoviesState.Value.PageSize, m_pageToken);
+      if (tuple is not null)
       {
-        await MovieDetailsModal.OpenAsync();
+        var (movies, newPageToken) = tuple.Value;
+        m_pageToken = newPageToken;
+        Dispatcher.Dispatch(new MoviesAddMoviesAction(movies));
       }
+      else
+      {
+        await UnableToFetchErrorModal.OpenAsync();
+      }      
+    }
+
+    /// <summary>
+    /// Load more movies when the button is clicked and also
+    /// disable the button so that it can't be clicked
+    /// multiple times when it's already clicked.
+    /// </summary>
+    /// <returns>Empty task</returns>
+    private async Task LoadMoreMoviesButtonClicked()
+    {
+      LoadMoreMoviesButtonText = "Loading...";
+
+      await LoadMovies();
+
+      LoadMoreMoviesButtonText = "Load more movies";
     }
 
   }

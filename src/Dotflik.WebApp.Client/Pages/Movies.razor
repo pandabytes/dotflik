@@ -10,6 +10,8 @@
 
 @if (MoviesState.Value.Movies.Count > 0)
 {
+  <MovieDetailsModal @ref="MovieDetailsModal" ModalId="movieModal" Movie="m_selectMovie" />
+
   <div class="card-columns">
     @foreach (var movie in MoviesState.Value.Movies)
     {
@@ -33,12 +35,19 @@
             </button>
           </small>
         </div>
-
       </div>
     }
   </div>
 
-  <MovieDetailsModal @ref="MovieDetailsModal" ModalId="@MovieModalId" Movie="m_selectMovie" />
+  <div class="container">
+    <div class="col-md-12 text-center">
+      <button type="button" class="btn btn-secondary btn" disabled="@(!LoadMoreMoviesButtonEnable)"
+              style="margin: 15px 0;" @onclick="@LoadMoreMoviesButtonClicked">
+        @LoadMoreMoviesButtonText
+      </button>
+    </div>
+  </div>
+  
 }
 else
 {
