@@ -31,5 +31,17 @@ namespace Dotflik.WebApp.Client.Store.Movies
       return state with { Movies = updatedMoviesList };
     }
 
+    /// <summary>
+    /// Set a new page token in the store. This new page token
+    /// will be used request for the next batch of movies and it should
+    /// be updated with the page token received from the movie service.
+    /// </summary>
+    /// <param name="state">Current state.</param>
+    /// <param name="action">Action to set a new page token to the store.</param>
+    /// <returns>Updated state with a new page token.</returns>
+    [ReducerMethod]
+    public static MoviesState OnSetPageToken(MoviesState state, MoviesSetPageTokenAction action)
+      => state with { PageToken = action.PageToken };
+
   }
 }

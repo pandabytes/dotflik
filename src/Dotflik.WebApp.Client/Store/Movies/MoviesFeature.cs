@@ -16,7 +16,7 @@ namespace Dotflik.WebApp.Client.Store.Movies
 
     /// <inheritdoc/>
     protected override MoviesState GetInitialState()
-      => new MoviesState(Movies: new List<Movie>(), PageSize: 10);
+      => new MoviesState(Movies: new List<Movie>(), PageSize: 10, PageToken: string.Empty);
 
   }
 }

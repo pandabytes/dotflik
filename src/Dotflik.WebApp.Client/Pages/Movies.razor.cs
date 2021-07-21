@@ -78,12 +78,6 @@ namespace Dotflik.WebApp.Client.Pages
     private Domain.Aggregates.Movie? m_selectMovie;
 
     /// <summary>
-    /// The current page token to request 
-    /// for the next set of movies.
-    /// </summary>
-    private string m_pageToken = string.Empty;
-
-    /// <summary>
     /// The error modal that displays an error message telling
     /// user it is unable to fetch movies when the app first loads.
     /// </summary>
@@ -178,14 +172,15 @@ namespace Dotflik.WebApp.Client.Pages
     /// If the method is unable to load movies, it will display
     /// the <see cref="UnableToFetchErrorModal"/> modal.
     /// </remarks>
-    /// <returns>Empty task</returns>
+    /// <returns>Empty task.</returns>
     private async Task LoadMovies()
     {
-      var tuple = await GetMovies(MoviesState.Value.PageSize, m_pageToken);
+      var (pageSize, pageToken) = (MoviesState.Value.PageSize, MoviesState.Value.PageToken);
+      var tuple = await GetMovies(pageSize, pageToken);
       if (tuple is not null)
       {
         var (movies, newPageToken) = tuple.Value;
-        m_pageToken = newPageToken;
+        Dispatcher.Dispatch(new MoviesSetPageTokenAction(newPageToken));
         Dispatcher.Dispatch(new MoviesAddMoviesAction(movies));
       }
       else
