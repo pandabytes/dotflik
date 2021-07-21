@@ -11,11 +11,11 @@ namespace Dotflik.WebApp.Client.Store.Movies
   {
     /// <summary>
     /// Add movies to the store. If movies in <paramref name="action"/> are
-    /// already in the store, then they will be skipped
+    /// already in the store, then they will be skipped.
     /// </summary>
-    /// <param name="state">Current state</param>
-    /// <param name="action">Action to add movies to the store</param>
-    /// <returns>Updated state with added movies</returns>
+    /// <param name="state">Current state.</param>
+    /// <param name="action">Action to add movies to the store.</param>
+    /// <returns>Updated state with added movies.</returns>
     [ReducerMethod]
     public static MoviesState OnAddMovies(MoviesState state, MoviesAddMoviesAction action)
     {

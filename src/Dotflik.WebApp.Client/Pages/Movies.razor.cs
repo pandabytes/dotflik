@@ -114,13 +114,13 @@ namespace Dotflik.WebApp.Client.Pages
     protected MovieService.MovieServiceClient MovieService { get; set; } = null!;
 
     [Inject]
-    protected GenreService.GenreServiceClient GenreService { get; set; } = null!;
-
-    [Inject]
     protected IDispatcher Dispatcher { get; set; } = null!;
 
     [Inject]
     protected IState<MoviesState> MoviesState { get; set; } = null!;
+
+    [Inject]
+    protected GetGenreColor GetGenreColor { get; set; } = null!;
 
     /// <inheritdoc/>
     protected async override Task OnInitializedAsync()
@@ -135,16 +135,18 @@ namespace Dotflik.WebApp.Client.Pages
     /// <summary>
     /// Get the movies via gRPC movie service.
     /// </summary>
-    /// <param name="pageSize"></param>
-    /// <param name="token"></param>
+    /// <param name="pageSize">Number of movies to request.</param>
+    /// <param name="token">The token to get the next batch of movies.</param>
+    /// <param name="timeout">Number of seconds to wait for the service to return.</param>
     /// <returns>Tuple where 1st item is the list of movies and
-    /// 2nd item is the next token</returns>
-    private async Task<(List<Domain.Aggregates.Movie>, string)?> GetMovies(int pageSize, string token = "")
+    /// 2nd item is the next token.</returns>
+    private async Task<(List<Domain.Aggregates.Movie>, string)?> GetMovies(int pageSize, string token = "", int timeout = 3)
     {
       try
       {
+        var grpcCallOptions = new CallOptions(deadline: DateTime.UtcNow.AddSeconds(timeout));
         var request = new PaginationRequest { PageSize = pageSize, PageToken = token };
-        var response = await MovieService.ListMoviesAsync(request);
+        var response = await MovieService.ListMoviesAsync(request, grpcCallOptions);
 
         var movies = response.Movies.Select(m => m.ToDomainAggregate()).ToList();
         return (movies, response.PaginationResponse.NextPageToken);

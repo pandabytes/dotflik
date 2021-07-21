@@ -25,7 +25,9 @@ namespace Dotflik.WebApp.Client.Interop
     /// </exception>
     protected IJSObjectReference Module
     {
-      get => m_module ?? throw new InvalidOperationException($"Module at \"{ModuleScriptPath}\" is not loaded.");
+      get => m_module ?? 
+        throw new InvalidOperationException($"Module at \"{ModuleScriptPath}\" is not loaded. " + 
+                                            $"Please use the method {nameof(LoadModuleAsync)} to load the module.");
     }
 
     /// <summary>
