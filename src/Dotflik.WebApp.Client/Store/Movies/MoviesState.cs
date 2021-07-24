@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Dotflik.Domain.Aggregates;
+﻿using Dotflik.Domain.Aggregates;
+using Dotflik.Domain.Collections;
 
 namespace Dotflik.WebApp.Client.Store.Movies
 {
@@ -8,5 +7,5 @@ namespace Dotflik.WebApp.Client.Store.Movies
   /// The state updated by fetching data from the 
   /// gRPC movie service.
   /// </summary>
-  public record MoviesState(IReadOnlyList<Movie> Movies, int PageSize, string PageToken);
+  public record MoviesState(ReadonlyOrderedDictionary<string, Movie> Movies, int PageSize, string PageToken);
 }

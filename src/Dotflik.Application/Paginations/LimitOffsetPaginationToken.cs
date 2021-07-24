@@ -47,7 +47,7 @@ namespace Dotflik.Application.Paginations
       {
         if (value < 0)
         {
-          throw new ArgumentException("Limit must be at least 0");
+          throw new ArgumentException("Offset must be at least 0");
         }
         m_offset = value;
       }

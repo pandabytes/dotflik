@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Fluxor;
+﻿using Fluxor;
 using Dotflik.Domain.Aggregates;
+using Dotflik.Domain.Collections;
 
 namespace Dotflik.WebApp.Client.Store.Movies
 {
@@ -16,7 +14,10 @@ namespace Dotflik.WebApp.Client.Store.Movies
 
     /// <inheritdoc/>
     protected override MoviesState GetInitialState()
-      => new MoviesState(Movies: new List<Movie>(), PageSize: 10, PageToken: string.Empty);
-
+      => new MoviesState(Movies: new ReadonlyOrderedDictionary<string, Movie>(), 
+                         PageSize: 10, 
+                         PageToken: string.Empty);
+    
   }
 }
+

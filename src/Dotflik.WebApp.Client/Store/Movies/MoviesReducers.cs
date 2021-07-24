@@ -1,6 +1,9 @@
-﻿using System;
+﻿using System.Collections.Specialized;
 using System.Linq;
 using Fluxor;
+
+using Dotflik.Domain.Collections;
+using Dotflik.Domain.Aggregates;
 
 namespace Dotflik.WebApp.Client.Store.Movies
 {
@@ -21,14 +24,21 @@ namespace Dotflik.WebApp.Client.Store.Movies
     {
       var currentMovies = state.Movies;
 
+      // Populate with existing movies
+      var updatedMoviesDict = new OrderedDictionary();
+      foreach (var pair in currentMovies)
+      {
+        updatedMoviesDict.Add(pair.Key, pair.Value);
+      }
+
       // Only add movies that aren't in the store yet
-      var moviesToAdd = action.Movies.Where(
-        m => currentMovies.FirstOrDefault(x => x.Id == m.Id) is null);
+      var newMovies = action.Movies.Where(m => !updatedMoviesDict.Contains(m.Id));
+      foreach (var movie in newMovies)
+      {
+        updatedMoviesDict.Add(movie.Id, movie);
+      }
 
-      var updatedMoviesList = currentMovies.ToList();
-      updatedMoviesList.AddRange(moviesToAdd);
-
-      return state with { Movies = updatedMoviesList };
+      return state with { Movies = new ReadonlyOrderedDictionary<string, Movie>(updatedMoviesDict) };
     }
 
     /// <summary>
