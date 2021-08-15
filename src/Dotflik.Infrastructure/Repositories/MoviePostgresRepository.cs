@@ -25,7 +25,7 @@ namespace Dotflik.Infrastructure.Repositories
     async Task<IEnumerable<Movie>> IReadOnlyRepository<Movie>.GetAllAsync(int limit, int offset)
     {
       var parameters = new { Limit = limit, Offset = offset };
-      var sql = $@"
+      var sql = @"
         SELECT m.*, s.*, g.*
         FROM (SELECT *
 	            FROM movies
@@ -165,28 +165,28 @@ namespace Dotflik.Infrastructure.Repositories
         splitOn: "id,id");
 
       var resultMovies = movies.GroupBy(m => m.Id)
-                                .Select(g =>
-                                {
-                                  // Copy the "entities" properties
-                                  // Movies are grouped by the movie id, hence
-                                  // all the movies' properties are the same
-                                  var groupedMovie = g.First();
-                                  var movie = new Movie()
-                                  {
-                                    Id = groupedMovie.Id,
-                                    Title = groupedMovie.Title,
-                                    Director = groupedMovie.Director,
-                                    Year = groupedMovie.Year,
-                                    BannerUrl = groupedMovie.BannerUrl
-                                  };
+                               .Select(g =>
+                               {
+                                 // Copy the "entities" properties
+                                 // Movies are grouped by the movie id, hence
+                                 // all the movies' properties are the same
+                                 var groupedMovie = g.First();
+                                 var movie = new Movie()
+                                 {
+                                   Id = groupedMovie.Id,
+                                   Title = groupedMovie.Title,
+                                   Director = groupedMovie.Director,
+                                   Year = groupedMovie.Year,
+                                   BannerUrl = groupedMovie.BannerUrl
+                                 };
+                                 
+                                 // Populate the "aggregate" properties
+                                 var genres = g.Select(m => m.Genres.Single()).ToHashSet();
+                                 var stars = g.Select(m => m.Stars.Single()).ToHashSet();
+                                 movie.Genres.AddRange(genres);
+                                 movie.Stars.AddRange(stars);
 
-                                  // Populate the "aggregate" properties
-                                  var genres = g.Select(m => m.Genres.Single()).ToHashSet();
-                                  var stars = g.Select(m => m.Stars.Single()).ToHashSet();
-                                  movie.Genres.AddRange(genres);
-                                  movie.Stars.AddRange(stars);
-
-                                  return movie;
+                                 return movie;
                                 });
       return resultMovies;
     }

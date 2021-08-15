@@ -57,9 +57,8 @@ namespace Dotflik.WebApp.Server
 
       services.AddMovieRepository(Database.PostgresSQL)
               .AddGenreRepository(Database.PostgresSQL)
-              .AddDataAnnotationValidator();
-
-      services.AddPaginationTokenFactory();
+              .AddDataAnnotationValidator()
+              .AddPaginationTokenFactory();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

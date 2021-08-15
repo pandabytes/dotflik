@@ -50,7 +50,7 @@ namespace Dotflik.WebApp.Client.Pages
     /// Get a shallow list of movies within the given range.
     /// If the range is out of bound then an empty list is returned
     /// or the number of movies up until <paramref name="count"/> 
-    /// are returned.
+    /// is returned.
     /// </summary>
     /// <param name="index">Start index of the range</param>
     /// <param name="count">Number of movies to get</param>
@@ -105,16 +105,16 @@ namespace Dotflik.WebApp.Client.Pages
     private bool LoadMoreMoviesButtonEnable => LoadMoreMoviesButtonText == "Load more movies";
 
     [Inject]
-    protected MovieService.MovieServiceClient MovieService { get; set; } = null!;
+    protected MovieService.MovieServiceClient MovieService { get; init; } = null!;
 
     [Inject]
-    protected IDispatcher Dispatcher { get; set; } = null!;
+    protected IDispatcher Dispatcher { get; init; } = null!;
 
     [Inject]
-    protected IState<MoviesState> MoviesState { get; set; } = null!;
+    protected IState<MoviesState> MoviesState { get; init; } = null!;
 
     [Inject]
-    protected GetGenreColor GetGenreColor { get; set; } = null!;
+    protected GetGenreColor GetGenreColor { get; init; } = null!;
 
     /// <inheritdoc/>
     protected async override Task OnInitializedAsync()
@@ -163,10 +163,9 @@ namespace Dotflik.WebApp.Client.Pages
     }
 
     /// <summary>
-    /// Load movies using the token <see cref="m_pageToken"/>
+    /// Load movies using the token in <see cref="MoviesState"/>
     /// to the <see cref="MoviesState"/>. This method will also
-    /// update <see cref="m_pageToken"/> to the next page token
-    /// received from the movie service.
+    /// update the token to the next page token received from the movie service.
     /// </summary>
     /// <remarks>
     /// If the method is unable to load movies, it will display

@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  dotflik-db:
+    image: dotflik-db
+    build:
+      context: .
+      dockerfile: ./db/Dockerfile
+    ports:
+      - "5432:5432"
+
+  dotflik-server:
+    image: dotflik-server
+    environment: 
+      - ASPNETCORE_URLS=https://+;http://+
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: Dotflik.WebApp.Server.dll
+    ports:
+      - "5001:443"
+    volumes: 
+      - ./.aspnet/https:/https
+
+  # dotflik-client:
+  #   image: dotflik-client
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile
+  #   command: Dotflik.WebApp.Client.dll
+  #   ports:
+  #     - "5002:80"

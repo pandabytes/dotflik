@@ -18,9 +18,9 @@ namespace Dotflik.WebApp.Server.Settings
     /// <inheritdoc/>
     public override string ConnectionString
     { 
-      get => $@"Host={Host};Port={Port};
-                Username={Username};Password={Password};
-                Database={Database};Client Encoding={ClientEncoding}"; 
+      get => $"Host={Host};Port={Port};" +
+             $"Username={Username};Password={Password};" +
+             $"Database={Database};Client Encoding={ClientEncoding}"; 
     }
 
     [Required]
